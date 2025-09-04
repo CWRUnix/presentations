@@ -1,0 +1,10 @@
+project:
+  output-dir: _output
+
+toc: true
+number-sections: true
+  
+format:
+  typst: {}
+  html:
+    css: styles.css

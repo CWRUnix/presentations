@@ -1,0 +1,7 @@
+result
+out
+.direnv
+.quarto
+_output
+*.pdf
+*.html
