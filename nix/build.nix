@@ -15,6 +15,8 @@ stdenv.mkDerivation {
   ];
 
   buildPhase = ''
+    mkdir home
+    export HOME=$(realpath ./home)
     quarto render .
   '';
   installPhase = ''
