@@ -1,92 +1,11 @@
-/* Colors */
-:root {
-  --bg: #0b0d12;
-  --fg: #e8ecf3;
-  --muted: #b4bfd0;
-  --accent: #6ee7ff;
-  --code: #111827;
-}
-
-.reveal,
-.reveal .slides {
-  background: var(--bg);
-  color: var(--fg);
-}
-
-.reveal a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.reveal pre code,
-.reveal code {
-  background: var(--code);
-  color: #e5e7eb;
-}
-
-.reveal pre {
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-}
-
-/* Title styling */
-.title-slide {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.badge {
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-radius: 9999px;
-  padding: 0.05em 0.3em;
-  line-height: 1;
-  font-weight: 800;
-  font-size: 4em;
-}
-
-/* Helpers */
-.cols {
-  display: grid;
-  gap: 1.1rem;
-  grid-template-columns: 1fr 1fr;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .cols {
-    grid-template-columns: 1fr;
-  }
-}
-
-.callout {
-  border: 1px solid #2a3340;
-  background: #0e131a;
-  padding: 1rem;
-  border-radius: 12px;
-}
-
-.callout strong {
-  color: var(--accent);
-}
-
-.svg-card {
-  border: 1px solid #2a3340;
-  background: #0e131a;
-  border-radius: 12px;
-  padding: 1rem;
-}
-
+/* Round subgraph corners */
 .cluster rect {
   rx: 14;
   ry: 14;
 }
 
 svg foreignObject div {
-  display: table;
+  display: table !important;
   width: 100%;
   height: 100%;
 }
@@ -94,4 +13,5 @@ svg foreignObject div {
 span.nodeLabel {
   display: table-cell;
   vertical-align: middle;
+  text-align: center;
 }
