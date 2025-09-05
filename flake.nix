@@ -68,6 +68,7 @@
         };
         packages = rec {
           presentations = pkgs.callPackage ./nix/build.nix { inherit pythonPkg; };
+          CI = presentations;
           default = presentations;
         };
       }

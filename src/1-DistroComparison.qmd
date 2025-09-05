@@ -1,14 +1,4 @@
 ---
 title: "Distro Comparison"
-output:
-  typst:
-  html:
-format:
-  revealjs:
-    slide-number: c/t
-    show-slide-number: all
-    footer: "Distro Comparison - CWRUnix"
-    embed-resources: true
-execute: 
-  cache: true
 ---
+

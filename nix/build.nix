@@ -1,4 +1,4 @@
-{ stdenv, quarto, texliveFull, texworks, texstudio, librsvg, chromium, python3, pythonPkg, ... }:
+{ stdenv, quarto, texliveFull, texworks, texstudio, librsvg, chromium, which, python3, pythonPkg, ... }:
 stdenv.mkDerivation {
   pname = "CWRUnix-presentations";
   version = "0.0.1";
@@ -12,6 +12,7 @@ stdenv.mkDerivation {
     texstudio
     librsvg
     chromium
+    which
   ];
 
   buildPhase = ''

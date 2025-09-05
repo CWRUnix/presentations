@@ -5,6 +5,11 @@ toc: true
 number-sections: true
   
 format:
+  revealjs:
+    slide-number: c/t
+    show-slide-number: all
+    embed-resources: true
   typst: {}
-  html:
-    css: styles.css
+
+execute: 
+  cache: true
