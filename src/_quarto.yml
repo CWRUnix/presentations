@@ -1,16 +1,23 @@
 project:
   output-dir: _output
-
 toc: true
 number-sections: true
-  
+mermaid:
+  theme: dark
+  htmlLabels: false
 format:
   revealjs:
+    theme: night
     number-sections: false
     slide-number: c/t
     show-slide-number: all
     embed-resources: true
+    progress: true
+    transition: fade
+    background-transition: slide
+    hash: true
+    incremental: true
+    css: styles.css
   typst: {}
-
-execute: 
+execute:
   cache: true

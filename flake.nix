@@ -15,36 +15,38 @@
             allowBroken = true;
           };
         };
-        pythonPkg = pythonPackages: with pythonPackages; [
-          ipykernel
-          pandas
-          pip
-          numpy
-          scipy
-          sympy
-          matplotlib
-          pyyaml
-          nbformat
-          nbclient
-          jupyter
-        ];
+        pythonPkg = pythonPackages:
+          with pythonPackages; [
+            ipykernel
+            pandas
+            pip
+            numpy
+            scipy
+            sympy
+            matplotlib
+            pyyaml
+            nbformat
+            nbclient
+            jupyter
+          ];
       in {
         devShells = rec {
           quartoShell = let
-          in pkgs.mkShell {
-            packages = with pkgs; [
-              (python3.withPackages (pythonPkg))
-              quarto
-              texliveFull
-              texworks
-              texstudio
-              librsvg
-              chromium
-            ];
-            shellHook = ''
-              export QUARTO_CHROMIUM_HEADLESS_MODE=new
-            '';
-          };
+          in
+            pkgs.mkShell {
+              packages = with pkgs; [
+                (python3.withPackages pythonPkg)
+                quarto
+                texliveFull
+                texworks
+                texstudio
+                librsvg
+                chromium
+              ];
+              shellHook = ''
+                export QUARTO_CHROMIUM_HEADLESS_MODE=new
+              '';
+            };
           default = quartoShell;
         };
         formatter = let
@@ -67,7 +69,7 @@
         apps = rec {
         };
         packages = rec {
-          presentations = pkgs.callPackage ./nix/build.nix { inherit pythonPkg; };
+          presentations = pkgs.callPackage ./nix/build.nix {inherit pythonPkg;};
           CI = presentations;
           default = presentations;
         };

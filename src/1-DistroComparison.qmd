@@ -1,81 +1,133 @@
 ---
 title: "Distro Comparison"
+author: "Presented by Trevor and Evan"
 ---
 
-## Package Managers Across Distros
+## Package Managers Across Distros {.smaller}
 
-- APT → Debian, Ubuntu, Mint
-- DNF → Fedora, RHEL, CentOS
-- Pacman → Arch, Manjaro
+- APT → Debian / Ubuntu / Mint
+- DNF → Fedora / RHEL / CentOS Stream
+- Pacman → Arch / Manjaro
 - Zypper → openSUSE
-- Nix → NixOS, multi-distro package manager
-- Flatpak / Snap → universal formats
-
----
+- Nix → Multi-distro (user or system level)
+- Universal: Flatpak / Snap
 
 ## Installing & Updating Software
 
-- Typical flow: install → update → upgrade
-- Commands differ:
-    - apt install, apt upgrade
-    - dnf install, dnf upgrade
-    - pacman -S, pacman -Syu
-- Nix: just shrimply add it to your config file
-- GUI software centers often wrap these
+:::: {.columns}
+::: {.column}
 
----
+### Debian/Ubuntu (APT)
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install <pkg>
+```
 
-## Package Managers in DevOps & Scripting
+### Fedora (DNF)
+```bash
+sudo dnf upgrade --refresh
+sudo dnf install <pkg>
+```
 
-- Automating installs in shell scripts
-- Using configuration management (e.g., Ansible, Nix flakes)
-- Reproducible builds & dependency locking
-- CI/CD pipelines relying on package managers
+:::
+::: {.column}
 
----
+### Arch (Pacman)
+```bash
+sudo pacman -Syu
+sudo pacman -S <pkg>
+```
+
+### Nix (User env)
+```bash
+nix profile upgrade --all
+nix profile install nixpkgs#<pkg>
+```
+
+:::
+::::
 
 ## What Makes Distros Different?
 
-- Package manager & release model
+:::: {.columns}
+::: {.column}
+
+- Package manager & dependency model
+- Release model (LTS, rolling, point)
 - Init system (systemd vs alternatives)
-- Target audience (desktop, server, minimal, bleeding edge)
-- Default software stack (GNOME vs KDE, etc.)
-- Community vs corporate support
+- Target audience & philosophy
+
+:::
+::: {.column}
+
+- Default desktop & tooling
+- Drivers / hardware enablement cadence
+- Community vs corporate governance
+- Documentation & support ecosystem
+
+:::
+::::
 
 ---
 
-## Why Choose One Over the Other?
+### Why Choose One Over the Other?
 
-- Stability vs bleeding edge
-- Community vs enterprise support
-- Ease of use vs customization
-- Hardware compatibility
-- Learning goals (Arch/Nix for learning, Ubuntu for getting stuff done)
+| Axis              | Favors             | Examples              |
+|-------------------|--------------------|-----------------------|
+| Stability (LTS)   | Debian/Ubuntu LTS  | Servers, labs         |
+| Bleeding edge     | Arch/Fedora        | Kernel / Dev          |
+| Reproducibility   | NixOS              | Dev envs, CI          |
+| GUI tools         | Ubuntu/Fedora      | Onboarding, classrooms|
+| YaST/Config GUI   | openSUSE           | Admin friendliness    |
 
----
+## “Applications” of Different Distros
 
-## Applications of Different Distros
-
-- Servers: Debian, Ubuntu LTS, RHEL
-- Desktops: Fedora, Linux Mint, Pop!_OS
-- Lightweight / Reviving old PCs: Arch, Void, Puppy, Lubuntu
-- Specialized: Kali (security), SteamOS (gaming), NixOS (reproducibility)
-
----
+- **Servers/Labs** → Debian/Ubuntu LTS, RHEL/CentOS Stream
+- **Daily Desktop** → Ubuntu, Fedora, Mint
+- **Power Users** → Arch, openSUSE Tumbleweed
+- **Reproducible/Dev** → NixOS (or Nix on any distro)
+- **Lightweight/Legacy** → Debian + lightweight DE, Arch-based spins
 
 ## Why Aren’t You Already on Nix?
 
-- Declarative configs, reproducibility, rollback safety
-- Works on top of any distro, not just NixOS
-- Dev environments without polluting system
-- But: learning curve is steep, docs can be dense
-- “It’s not weird, it’s just different”
+- Declarative configs & rollbacks
+- Reproducible dev environments
+- Works alongside any distro
+- Learning curve & mindset shift *(call it out honestly)*
 
----
+## Landscape at a Glance
 
-## Wrap-Up / Discussion
+```{mermaid}
+graph TD
+  %% Debian family
+  subgraph Debian Family
+    Debian([Debian])
+    Ubuntu([Ubuntu])
+    Mint([Mint])
+    Debian --> Ubuntu --> Mint
+  end
 
-- Every distro has strengths & trade-offs
-- Try a few in VMs/WSL/Dual-boot
-- Think about what problem you want Linux to solve for you
-- Open Q&A
+  %% Fedora / RHEL family
+  subgraph Fedora / RHEL
+    Fedora([Fedora])
+    RHEL([RHEL])
+    CentOS([CentOS])
+    Fedora --> CentOS
+    RHEL --> CentOS
+  end
+
+  %% Arch / Nix family
+  subgraph Arch / Nix
+    Arch([Arch])
+    Manjaro([Manjaro])
+    NixOS([NixOS])
+    Arch --> Manjaro
+  end
+```
+
+## Discussion / Wrap-up
+
+- Try some different distros our in VMs or on a second partition
+- What are you optimizing for in your use of Linux?
+- Which distro fits your hardware and your workflows?
