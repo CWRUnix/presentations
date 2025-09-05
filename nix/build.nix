@@ -6,6 +6,7 @@
   texstudio,
   librsvg,
   chromium,
+  typst,
   which,
   python3,
   pythonPkg,
@@ -24,6 +25,7 @@ stdenv.mkDerivation {
     texstudio
     librsvg
     chromium
+    typst
     which
   ];
 

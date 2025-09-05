@@ -18,6 +18,5 @@ format:
     hash: true
     incremental: true
     css: styles.css
-  typst: {}
 execute:
   cache: true

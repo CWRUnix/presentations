@@ -40,6 +40,7 @@
                 texliveFull
                 texworks
                 texstudio
+                typst
                 librsvg
                 chromium
               ];
