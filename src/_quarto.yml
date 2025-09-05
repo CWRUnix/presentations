@@ -6,6 +6,7 @@ number-sections: true
   
 format:
   revealjs:
+    number-sections: false
     slide-number: c/t
     show-slide-number: all
     embed-resources: true

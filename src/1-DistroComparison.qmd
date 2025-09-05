@@ -2,3 +2,80 @@
 title: "Distro Comparison"
 ---
 
+## Package Managers Across Distros
+
+- APT → Debian, Ubuntu, Mint
+- DNF → Fedora, RHEL, CentOS
+- Pacman → Arch, Manjaro
+- Zypper → openSUSE
+- Nix → NixOS, multi-distro package manager
+- Flatpak / Snap → universal formats
+
+---
+
+## Installing & Updating Software
+
+- Typical flow: install → update → upgrade
+- Commands differ:
+    - apt install, apt upgrade
+    - dnf install, dnf upgrade
+    - pacman -S, pacman -Syu
+- Nix: just shrimply add it to your config file
+- GUI software centers often wrap these
+
+---
+
+## Package Managers in DevOps & Scripting
+
+- Automating installs in shell scripts
+- Using configuration management (e.g., Ansible, Nix flakes)
+- Reproducible builds & dependency locking
+- CI/CD pipelines relying on package managers
+
+---
+
+## What Makes Distros Different?
+
+- Package manager & release model
+- Init system (systemd vs alternatives)
+- Target audience (desktop, server, minimal, bleeding edge)
+- Default software stack (GNOME vs KDE, etc.)
+- Community vs corporate support
+
+---
+
+## Why Choose One Over the Other?
+
+- Stability vs bleeding edge
+- Community vs enterprise support
+- Ease of use vs customization
+- Hardware compatibility
+- Learning goals (Arch/Nix for learning, Ubuntu for getting stuff done)
+
+---
+
+## Applications of Different Distros
+
+- Servers: Debian, Ubuntu LTS, RHEL
+- Desktops: Fedora, Linux Mint, Pop!_OS
+- Lightweight / Reviving old PCs: Arch, Void, Puppy, Lubuntu
+- Specialized: Kali (security), SteamOS (gaming), NixOS (reproducibility)
+
+---
+
+## Why Aren’t You Already on Nix?
+
+- Declarative configs, reproducibility, rollback safety
+- Works on top of any distro, not just NixOS
+- Dev environments without polluting system
+- But: learning curve is steep, docs can be dense
+- “It’s not weird, it’s just different”
+
+---
+
+## Wrap-Up / Discussion
+
+- Every distro has strengths & trade-offs
+- Try a few in VMs/WSL/Dual-boot
+- Think about what problem you want Linux to solve for you
+- Open Q&A
