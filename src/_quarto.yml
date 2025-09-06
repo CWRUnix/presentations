@@ -16,7 +16,7 @@ format:
     transition: fade
     background-transition: slide
     hash: true
-    incremental: true
+    # incremental: true
     css: styles.css
 execute:
   cache: true

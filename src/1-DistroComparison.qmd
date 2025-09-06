@@ -3,91 +3,266 @@ title: "Distro Comparison"
 author: "Presented by Trevor and Evan"
 ---
 
-## Package Managers Across Distros {.smaller}
+## Landscape at a Glance
 
-- APT → Debian / Ubuntu / Mint
-- DNF → Fedora / RHEL / CentOS Stream
-- Pacman → Arch / Manjaro
-- Zypper → openSUSE
-- Nix → Multi-distro (user or system level)
-- Universal: Flatpak / Snap
+```{mermaid}
+graph TD
+  subgraph Gentoo
+    Gent([Gentoo])
+    ChromeOS([ChromeOS])
+    Gent --> ChromeOS
+  end
+  subgraph Fedora / RHEL
+    Fedora([Fedora])
+    RHEL([RHEL])
+    Rocky([Rocky])
+    SilverBlue([SilverBlue])
+    CentOS([CentOS])
+    RHEL --> CentOS
+    Fedora --> SilverBlue
+  end
+  subgraph Arch
+    Arc([Arch])
+    Manjaro([Manjaro])
+    EndeavorOS([EndeavorOS])
+    Arc --> EndeavorOS
+    Arc --> Manjaro
+  end
+```
+```{mermaid}
+graph TD
+  subgraph Independent
+    NixOS([NixOS])
+    Alpine([Alpine])
+    Qubes([Qubes])
+    Tails([Tails])
+  end
+  subgraph Debian
+    Deb([Debian])
+    Ubuntu([Ubuntu])
+    Mint([Mint])
+    PopOS([PopOS])
+    Deb --> Ubuntu
+    Ubuntu --> PopOS
+    Ubuntu --> Mint
+  end
+```
 
-## Installing & Updating Software
+## What makes Distros Different?
 
 :::: {.columns}
 ::: {.column}
-
-### Debian/Ubuntu (APT)
-```bash
-sudo apt update
-sudo apt upgrade
-sudo apt install <pkg>
-```
-
-### Fedora (DNF)
-```bash
-sudo dnf upgrade --refresh
-sudo dnf install <pkg>
-```
-
+- Package Management
+- Stability and Release Model
+- Sane Defaults / DIY
+- Documentation Support
 :::
 ::: {.column}
-
-### Arch (Pacman)
-```bash
-sudo pacman -Syu
-sudo pacman -S <pkg>
-```
-
-### Nix (User env)
-```bash
-nix profile upgrade --all
-nix profile install nixpkgs#<pkg>
-```
-
-:::
-::::
-
-## What Makes Distros Different?
-
-:::: {.columns}
-::: {.column}
-
-- Package manager & dependency model
-- Release model (LTS, rolling, point)
-- Init system (systemd vs alternatives)
-- Target audience & philosophy
-
-:::
-::: {.column}
-
-- Default desktop & tooling
-- Drivers / hardware enablement cadence
-- Community vs corporate governance
-- Documentation & support ecosystem
-
+- Single / Multi User
+- Reproducibility / Reliability
+- Immutibility, A/B root
+- Community vs. Corporate support
 :::
 ::::
 
 ---
 
-### Why Choose One Over the Other?
+### Package Management
+
+
+| Package Manager | Primary Format | Common Distros | Package Source | Dependency Resolution |
+| --------------- | -------------- | -------------- | -------------- | --------------------- |
+| APT             | .deb           | Debian+        | Binary         | Strong                |
+| DNF             | .rpm           | RHEL, Fedora   | Binary         | Strong                |
+| Pacman          | .pkg.tar.zst   | Arch           | Binary         | Manual sometimes      |
+| Zypper          | .rpm           | openSUSE       | Binary         | Strong                |
+| Portage         | Source         | Gentoo         | Source         | High                  |
+| Nix             | .nix / .nar    | All            | Both           | Per package           |
+| Flatpak         | .flatpak       | All            | Binary         | No traditional deps   |
+| AppImage        | .AppImage      | All            | Binary         | All Bundled           |
+
+---
+
+#### Installing Packages
+
+:::: {.columns}
+::: {.column}
+##### Debian/Ubuntu (APT)
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install pkg
+```
+:::
+::: {.column}
+##### Fedora (DNF)
+```bash
+sudo dnf upgrade --refresh
+sudo dnf install pkg
+```
+:::
+::::
+<br/>
+
+:::: {.columns}
+::: {.column}
+##### Arch (Pacman)
+```bash
+sudo pacman -Syu
+sudo pacman -S pkg
+```
+:::
+::: {.column}
+##### Nix (User env)
+```bash
+nix profile upgrade --all
+nix profile install nixpkgs#pkg
+```
+:::
+::::
+
+---
+
+### Release Models
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- **Debian**: Stable, 2+ years
+- **Ubuntu**: Stable desktop, 6 months
+- **Fedora**: Fast enterprise, 6 months
+- **Arch**: Rolling release.
+- **NixOS**: rolling release + stable 6 months
+:::
+::: {.column}
+Philosophy:
+
+- Stability-focused distros freeze software to reduce bugs.
+- Rolling distros favor cutting-edge features, expecting users to manage breakage.
+:::
+::::
+
+---
+
+### Setup Required
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- **PopOS/Mint**: Everything preconfigured
+- **Ubuntu/Fedora**: Mostly preconfigured
+- **Arch/Gentoo**: Minimal base, DIY
+- **NixOS**: Explicit config
+- **LFS**: Build your own distro
+:::
+::: {.column}
+Philosophy:
+
+- Sane defaults = Easy to get into
+- DIY = Minimal assumptions, Maximal customization
+:::
+::::
+
+---
+
+### Documentation Provided
+
+- **Arch Wiki**: Highly detailed, community-driven
+- **Gentoo Docs**: Technical and exhaustive
+- **Ubuntu/Fedora**: Corporate-backed wikis and forums
+- **NixOS Manual**: Accurate, but small
+
+---
+
+### Single vs. Multi User Systems
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- SU Desktop-first: Ubuntu, Fedora Workstation
+- MU Server: Debian, RHEL
+- NixOS: Supports both with configuration, per-user package management.
+:::
+::: {.column}
+Philosophy:
+
+- Desktop distros assume one user per device and have less need to put boundaries between systems
+- Server distros emphasize user permissions, security boundaries, protecting shared resources
+:::
+::::
+
+---
+
+### Reproducibility
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- **NixOS/Guix**: Full reproducibility - builds are identical anywhere
+- **Debian/Fedora**: Partial - depends on package versions and sources
+- **Arch**: Less emphasis - user manages state manually
+:::
+::: {.column}
+Philosophy:
+
+- Reproducibility ensures consistency, especially in devops/cloud
+- Traditional distros trade this for flexibility and ease of use
+:::
+::::
+
+---
+
+### Immutability
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- **NixOS**: System is built from declarative config, rollback-able
+- **Fedora Silverblue**: Immutable OS, uses rpm-ostree and overlays
+- **SteamOS**: Immutable version of Arch
+- **Vanilla distros**: Mutable root filesystems
+:::
+::: {.column}
+Philosophy:
+
+- Immutability: Stability, rollback safety, less drift
+- Mutable: Familiarity, quick changes, manual fixes
+:::
+::::
+
+---
+
+### Community vs. Corporate Orientation
+
+:::: {.columns}
+::: {.column}
+Distros Compared:
+
+- **Debian, Arch, Gentoo, NixOS**: Community-led, volunteer-driven.
+- **Ubuntu (Canonical), Fedora (Red Hat)**: Corporate-backed.
+:::
+::: {.column}
+Philosophy:
+
+- Community distros prioritize freedom and transparency.
+- Corporate-backed distros focus on support, enterprise readiness.
+:::
+::::
+
+## Why Choose One Over the Other?
 
 | Axis              | Favors             | Examples              |
 |-------------------|--------------------|-----------------------|
 | Stability (LTS)   | Debian/Ubuntu LTS  | Servers, labs         |
-| Bleeding edge     | Arch/Fedora        | Kernel / Dev          |
+| Bleeding edge and Documentation     | Arch/Fedora        | Kernel / Dev          |
 | Reproducibility   | NixOS              | Dev envs, CI          |
-| GUI tools         | Ubuntu/Fedora      | Onboarding, classrooms|
-| YaST/Config GUI   | openSUSE           | Admin friendliness    |
-
-## “Applications” of Different Distros
-
-- **Servers/Labs** → Debian/Ubuntu LTS, RHEL/CentOS Stream
-- **Daily Desktop** → Ubuntu, Fedora, Mint
-- **Power Users** → Arch, openSUSE Tumbleweed
-- **Reproducible/Dev** → NixOS (or Nix on any distro)
-- **Lightweight/Legacy** → Debian + lightweight DE, Arch-based spins
+| Desktop         | MintOS, Elementary      | Onboarding, classrooms|
+| Lightweight       | Arch, NixOS      | Less powerful systems |
 
 ## Why Aren’t You Already on Nix?
 
@@ -95,36 +270,6 @@ nix profile install nixpkgs#<pkg>
 - Reproducible dev environments
 - Works alongside any distro
 - Learning curve & mindset shift *(call it out honestly)*
-
-## Landscape at a Glance
-
-```{mermaid}
-graph TD
-  %% Debian family
-  subgraph Debian Family
-    Debian([Debian])
-    Ubuntu([Ubuntu])
-    Mint([Mint])
-    Debian --> Ubuntu --> Mint
-  end
-
-  %% Fedora / RHEL family
-  subgraph Fedora / RHEL
-    Fedora([Fedora])
-    RHEL([RHEL])
-    CentOS([CentOS])
-    Fedora --> CentOS
-    RHEL --> CentOS
-  end
-
-  %% Arch / Nix family
-  subgraph Arch / Nix
-    Arch([Arch])
-    Manjaro([Manjaro])
-    NixOS([NixOS])
-    Arch --> Manjaro
-  end
-```
 
 ## Discussion / Wrap-up
 
