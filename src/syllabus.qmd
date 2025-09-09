@@ -83,6 +83,17 @@ Tinkham Veale Student Center
 - Filesystems overview: ext4, XFS, Btrfs, ZFS
 - Disk tools: `lsblk`, `fdisk`, `mount`, `df`
 - FS structure comparison / deep dive
+- Plan 9 brief rundown
+
+### Networking, Web Servers, and Security
+
+- Linux networking tools: `ip`, `ss`, `nmap`, etc.
+- Web servers: Nginx, Apache
+- Reverse proxies
+- SELinux
+- AppArmor
+- Containerization
+- Ethical Hacking Rundown
 
 ### Desktop Linux
 
@@ -125,15 +136,6 @@ Tinkham Veale Student Center
 
 ## Harder Topics
 
-### Networking, Web Servers, and Security
-
-- Linux networking tools: `ip`, `ss`, `nmap`, etc.
-- Web servers: Nginx, Apache
-- Reverse proxies
-- SELinux
-- AppArmor
-- Containerization
-
 ### DevOps Fundamentals
 
 - CI/CD concepts
@@ -156,8 +158,3 @@ Tinkham Veale Student Center
 - Linux From Scratch (LFS) overview
     - Custom kernels
     - Building Linux manually
-
-### Random Other Things
-
-- Plan 9
-- Ethical Hacking
