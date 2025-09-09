@@ -27,7 +27,7 @@ Discord: [discord.gg/gsGZbJbxkU](https://discord.gg/gsGZbJbxkU)
 ## Meeting Times
 
 18:15 - 21:30
-Student Organization Center
+Student Organization Center (West side)
 Tinkham Veale Student Center
 
 ## Recommended Supplementary Materials
@@ -54,104 +54,200 @@ Tinkham Veale Student Center
 - What is Linux?
 - The Linux and UNIX philosophy
     - "Do one thing and do it well"
-- Setting up WSL on Windows / QEMU on Mac so people can play with Linux
+- Setting up WSL on Windows / QEMU on Mac
 
 ### Distro Comparison
 
-- Package managers across distros: `apt`, `dnf`, `pacman`, `nix`, etc.
+- Package managers across distros: `apt`, `dnf`, `pacman`, `nix`, `rpm`, etc.
 - Installing and updating software
-- Package managers revisit during scripting/devops topics
 - What makes different distros different
 - Why would you choose one over the other
 - What are some applications of different distros
-- Why aren’t you already on nix
 
-### Shell Scripting and Bash Essentials
+### Linux Basics
+
+- The Structure of Linux
+- Processes
+- Filesystem Heirarchy (FHS)
+- Namespaces
+- SystemD
+- SSH
+- TTY and terminal emulators
+- User vs. Kernel Space
+- Syscalls
+- Cgroups
+- Environmental Variables
+    - PATH
+    - Library Pathes
+
+### Scripting and Bash Essentials
 
 - Command line basics and utilities
+    - GNU coreutils / Busybox
 - Bash and its derivatives
 - Environment variables, pipes, redirection
 - Writing simple bash scripts
 - Variables, conditionals, loops
-- Automating tasks with scripts
+- Common conventions of scripting
+- CLI Conventions
+- Esoteric scripting languages
+    - Nushell
+    - Fish
+    - JQ
+    - Regex
+- Python and other hihgher level languages
 
 ### Filesystems and File Mangement
 
 - Basic Linux filesystem structure (FHS)
 - File permissions (`chmod`, `chown`)
+- Chroot'ing
 - Mounting and navigating the filesystem
 - Filesystems overview: ext4, XFS, Btrfs, ZFS
 - Disk tools: `lsblk`, `fdisk`, `mount`, `df`
+- FUSE
 - FS structure comparison / deep dive
 - Plan 9 brief rundown
 
 ### Networking, Web Servers, and Security
 
 - Linux networking tools: `ip`, `ss`, `nmap`, etc.
-- Web servers: Nginx, Apache
-- Reverse proxies
-- SELinux
-- AppArmor
-- Containerization
-- Ethical Hacking Rundown
+- Web servers: Apache
+- Reverse proxies: Nginx
+- 7 Layers of the Network Stack
+- PGP
+- NFtables and Firewalls
+- DNS Heirarchy
+- Tunnels and VPNs
+- BGP / BIRD routing
+- Local level network switching
+- Sockets and RTC
+- Packets
 
 ### Desktop Linux
 
 - Overview of DEs: GNOME, KDE, XFCE, i3
-- Customizing your Linux desktop
+- Customizing your Linux desktop (Ricing)
 - X11 vs Wayland
-- Desktop Portals
-- DBus
 - XDG
+- Desktop Portals
+- Audio
+- Common User Daemons
+    - DBus
+    - Notifications
+    - Bluetooth
+    - Pipewire
 
 ## Intermediate Topics
 
 ### Linux Tools and The Linux Boot Process
 
-- GRUB and EFI
-- Init systems: systemd
-- Systemd Day (services, timers, `journalctl`, mounts, networkd)
-- Vim basics and configuration
 - Git basics (clone, commit, push)
+- Vim basics and configuration
 - Crontab and job scheduling
+- Wolf's Favorite CLI tools
+- GRUB and EFI
+- Partitioning Tools
+- Init systems
+- Systemd Day
+    - Services
+    - Timers
+    - `journalctl`
+    - Mounts
+    - Networkd
+
+### Linux Security
+
+- SELinux
+- Flatpak / Bubblewrap
+- Linux Hardening
+- PGP / GPG / SSH
+- TTOP and Yubikeys
+- Common Attack Vectors
+- AppArmor
+- Secure Boot
+- TPM, Intel ME, AMD PSP
+- Memory Safety
+- Containerization
+- Kali Tools
+- Hypervisors and microkernels
+    - Firecracker microVMs
 
 ### Virtualization, VMs, and Containers
 
-- QEMU and KVM
-- Playing around with VMs
-- Wine/Proton for running Windows software
-- Docker vs Podman
+- QEMU / KVM / HyperV / Virtualization.Framework
+- Wine / Proton
+- Docker, Podman, nspawn
 - OCI concepts
-- Containerization Day:
-    - Build and run containers
-    - Compare with VMs
-    - systemd-nspawn
+    - Runtimes
+- Network File Shares
+- P9FS
 
-### Cloud and Infrastructure
+### Cloud, Infrastructure, and DevOps
 
-- Cloud Hosting Day:
-    - AWS intro
-    - How to use cloud VMs (e.g., EC2)
-- Terraform, Pulumi, IaC basics
+- Cloud Hosting
+    - AWS, EC2
+    - Azure
+- Terraform, Ansible, Pulumi, IaC
+- CI/CD concepts
+    - Github Actions
+    - Garnix
+    - Jenkins
+- Orchestraion and Kubernetes
+- Nix overview
 
 ## Harder Topics
 
-### DevOps Fundamentals
+### Systems Programming Day
 
-- CI/CD concepts
-- Ansible overview
-- Introduction to Kubernetes
-- Nix overview (precursor to Nix day)
+- Compilers
+- Rust
+- C/C++
+- Go
+- Zig
+- ASM
+- Linking, ELFs, Libraries
+- LSPs
+- Build Systems
+    - make / CMake
+    - Cargo
+    - Basil
 
-### Nix Day
+### Nix
 
-- What is Nix?
-- NixOS and reproducible builds
-- Declarative configuration
+- Functional Concepts
+- Motivation
+- Modern Software Deployment
+- Treating Filesystems like memory
+- The Language
+- The Nix Store
+- Derivations
+    - Closures
+    - Bundlers
+- Garbage Collection
+- Builders
+- Environments and Profiles
+- Substitutes and Binary Caches
+- Distributed Deployment
+- Content Addressibility
+- Modules, NixOS, nixpkgs
+    - Anywhere
+- Home-Manager and Package Management
+- Packaging Software
+    - The stdenv
+    - mkDerivations
+    - Advanced Builders
+    - Nix utilities
+- Flakes
+- Experimental Features
+    - IFD
+    - Nix in Nix
+    - Dynamic Derivations
+    - Fetch Closure
+    - Minimal Bootstrap
 
 ### Kernel and LFS Deep Dive
 
-- Kernel architecture: processes, memory, syscalls
 - Modules and drivers
 - Kernel parameters
 - Simple kernel module programming
