@@ -1,0 +1,163 @@
+---
+title: CWRU Linux Club Semester Syllabus
+subtitle: Fall 2025
+author: CWRUnix Executive Board
+format:
+    typst:
+        number-sections: false
+---
+{{< pagebreak >}}
+
+# Contact
+
+CampusGroups: [community.case.edu/CWRUnix/club_signup](https://community.case.edu/CWRUnix/club_signup)
+
+Discord: [discord.gg/gsGZbJbxkU](https://discord.gg/gsGZbJbxkU)
+
+## Executive Teaching Board
+
+| Exec Member      | Discord Handle | Email          | Website                |
+| ---------------- | -------------- | -------------- | ---------------------- |
+| Trevor Nichols   | .pmis          | tln32@case.edu | github.com/tnichols217 |
+| Wolf Mermelstein | 404wolf        | wsm32@case.edu | 404wolf.com            |
+| Evan Harnak      | chainsawpants  | ebh58@case.edu | evaniel.bandcamp.com   |
+
+# Semester Overview
+
+## Meeting Times
+
+18:15 - 21:30
+Student Organization Center
+Tinkham Veale Student Center
+
+## Recommended Supplementary Materials
+
+- Debian Handbook: [debian-beginners-handbook.arpinux.org/trixie-en/download/the_beginners_handbook.pdf](https://debian-beginners-handbook.arpinux.org/trixie-en/download/the_beginners_handbook.pdf)
+- Arch Wiki: [wiki.archlinux.org](https://wiki.archlinux.org)
+- Linuxize: [linuxize.com](https://linuxize.com)
+- LFS: [linuxfromscratch.org](https://www.linuxfromscratch.org)
+
+## Club Objectives
+
+- Build a support community around Linux
+- Promote open source software
+- Extend the lifespan of computing device
+- Teach about the philisophical aspects of the open source movement
+- Secure our electronics from digital and physical threats
+
+# Tentative Lecture Topics
+
+## Introductory Topics
+
+### Introduction to Linux
+
+- What is Linux?
+- The Linux and UNIX philosophy
+    - "Do one thing and do it well"
+- Setting up WSL on Windows / QEMU on Mac so people can play with Linux
+
+### Distro Comparison
+
+- Package managers across distros: `apt`, `dnf`, `pacman`, `nix`, etc.
+- Installing and updating software
+- Package managers revisit during scripting/devops topics
+- What makes different distros different
+- Why would you choose one over the other
+- What are some applications of different distros
+- Why aren’t you already on nix
+
+### Shell Scripting and Bash Essentials
+
+- Command line basics and utilities
+- Bash and its derivatives
+- Environment variables, pipes, redirection
+- Writing simple bash scripts
+- Variables, conditionals, loops
+- Automating tasks with scripts
+
+### Filesystems and File Mangement
+
+- Basic Linux filesystem structure (FHS)
+- File permissions (`chmod`, `chown`)
+- Mounting and navigating the filesystem
+- Filesystems overview: ext4, XFS, Btrfs, ZFS
+- Disk tools: `lsblk`, `fdisk`, `mount`, `df`
+- FS structure comparison / deep dive
+
+### Desktop Linux
+
+- Overview of DEs: GNOME, KDE, XFCE, i3
+- Customizing your Linux desktop
+- X11 vs Wayland
+- Desktop Portals
+- DBus
+- XDG
+
+## Intermediate Topics
+
+### Linux Tools and The Linux Boot Process
+
+- GRUB and EFI
+- Init systems: systemd
+- Systemd Day (services, timers, `journalctl`, mounts, networkd)
+- Vim basics and configuration
+- Git basics (clone, commit, push)
+- Crontab and job scheduling
+
+### Virtualization, VMs, and Containers
+
+- QEMU and KVM
+- Playing around with VMs
+- Wine/Proton for running Windows software
+- Docker vs Podman
+- OCI concepts
+- Containerization Day:
+    - Build and run containers
+    - Compare with VMs
+    - systemd-nspawn
+
+### Cloud and Infrastructure
+
+- Cloud Hosting Day:
+    - AWS intro
+    - How to use cloud VMs (e.g., EC2)
+- Terraform, Pulumi, IaC basics
+
+## Harder Topics
+
+### Networking, Web Servers, and Security
+
+- Linux networking tools: `ip`, `ss`, `nmap`, etc.
+- Web servers: Nginx, Apache
+- Reverse proxies
+- SELinux
+- AppArmor
+- Containerization
+
+### DevOps Fundamentals
+
+- CI/CD concepts
+- Ansible overview
+- Introduction to Kubernetes
+- Nix overview (precursor to Nix day)
+
+### Nix Day
+
+- What is Nix?
+- NixOS and reproducible builds
+- Declarative configuration
+
+### Kernel and LFS Deep Dive
+
+- Kernel architecture: processes, memory, syscalls
+- Modules and drivers
+- Kernel parameters
+- Simple kernel module programming
+- Linux From Scratch (LFS) overview
+    - Custom kernels
+    - Building Linux manually
+
+### Random Other Things
+
+- Plan 9
+- Ethical Hacking
