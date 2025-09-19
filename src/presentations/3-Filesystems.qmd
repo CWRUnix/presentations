@@ -1,0 +1,103 @@
+---
+title: "Filesystems"
+author: "Presented by Trevor"
+---
+
+# 1: Intro to Filesystems
+
+## What is a Filesystem
+
+- Tree Structure
+- Names
+- Files, Directories
+- Permissions
+
+## Properties of Filesystems
+
+- Physical Storage & RAID
+- Drivers
+
+## Filesystem Concepts
+
+- Inodes / Dentries
+- Blocks, Superblocks, Extents
+- Journaling, Metadata
+
+## In comparison to other file storage methods
+
+- Blob Storage
+- Databases
+
+# 2: Types of Filesystems
+
+## Traditional
+
+- ext4
+- NTFS
+- ReiserFS
+- HFS
+
+## Modern
+
+- XFS
+- BtrFS
+- F2FS
+- ZFS
+- APFS
+- ZFS
+
+## Network
+
+- NFS
+- SMB
+- CIFS
+- IPFS
+
+## Special
+
+- tmpfs/ramfs
+- overlayfs
+- squashfs
+- sysfs, procfs
+- lukfs/fscrypt
+
+## Comparison
+
+# 3: Filesystems on Linux
+
+## Filesystems on Linux
+
+- The VFS
+- Device Block Files
+- Drivers as Modules
+- Mounting mechanics
+- Linking
+
+## Filesystem Tools
+
+- mkfs
+- dd
+- fstab
+- mount/umount
+- fsck
+- tune2fs
+- df/du
+- iotop/iostat
+- (g)parted
+- disko
+- Stratis
+
+# 4: Implementation Details
+
+## Overarching Stucture
+
+- Layers of blocks
+- Journaling
+- Inodes and Dentries
+
+## Common Algorithms
+
+- Allocation Strategies (Bitmap, Extent, B-tree)
+- Garbage Collection
+- Dedup and Compression
+- CoW
