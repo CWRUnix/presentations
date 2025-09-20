@@ -5,15 +5,61 @@ author: "Presented by Trevor"
 
 # 1: Intro to Filesystems
 
+The way your computer stores information as files in an organized manner.
+
+Stored as a tree, with folders and files.
+
 ## What is a Filesystem
 
-- Tree Structure
-- Names
-- Files, Directories
+- Files and Folders as a tree structure
+
+```
+> tree
+
+/boot
+├── EFI
+│   ├── BOOT
+│   │   └── BOOTX64.EFI
+│   ├── Linux
+│   ├── nixos
+│   │   ├── 3wpmjs32cmbsrxdj2pn3a04hcrfyxzsj-linux-6.16.6-bzImage.efi
+│   │   ├── 7kbjk7q5nyhvl6fgyygiwad84wb16jy8-initrd-linux-6.16.6-initrd.efi
+│   └── systemd
+│       └── systemd-bootx64.efi
+└── loader
+    ├── entries
+    │   ├── nixos-generation-392.conf
+    │   ├── nixos-generation-393.conf
+    │   └── nixos-generation-394.conf
+    ├── entries.srel
+    ├── loader.conf
+    └── random-seed
+```
+
+## Structure of a Filesystem
+
+:::{ .center}
+
+| |
+| :-: |
+| |
+| Application |
+| VFS |
+| Page & Buffer Cache |
+| Filesystem |
+| LVM and RAID |
+| Device Mapper |
+| Partition Scheme |
+| Basic Block Storage |
+| I/O controller |
+| Physical Devices |
+| |
+
+:::
+
+## Purpose of Filesystems
+
 - Permissions
-
-## Properties of Filesystems
-
 - Physical Storage & RAID
 - Drivers
 
@@ -42,7 +88,6 @@ author: "Presented by Trevor"
 - XFS
 - BtrFS
 - F2FS
-- ZFS
 - APFS
 - ZFS
 
@@ -101,3 +146,7 @@ author: "Presented by Trevor"
 - Garbage Collection
 - Dedup and Compression
 - CoW
+
+# Sources
+
+- https://www.cs.uic.edu/~jbell/CourseNotes/OperatingSystems/12_FileSystemImplementation.html
