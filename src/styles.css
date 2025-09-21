@@ -19,3 +19,31 @@ span.nodeLabel {
 .reveal table {
   font-size: smaller;
 }
+
+
+marquee {
+  height: 100%;
+  width: 100%;
+    /* animation: blinker 3s linear infinite; */
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+.small-table table {
+  font-size: .4em;
+  margin: .5rem;
+}
+
+#TOC>nav {
+  display: relative;
+}
+
+#TOC>nav>ul, .scrollable{
+  overflow-y: scroll;
+  height: 90%;
+  width: 100%;
+}
