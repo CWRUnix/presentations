@@ -1,0 +1,264 @@
+---
+title: "Security and Privacy"
+author: "Presented by Trevor and Wolf"
+---
+
+# 1: Why Security?
+
+## What is Security?
+
+Security is a precaution
+
+- implemented through measures and practices
+- protects:
+  - data
+  - systems
+  - networks
+- from:
+  - unauthorized access
+  - damage
+  - theft
+
+## What is Privacy?
+
+Privacy is a right
+
+- to control where your data goes
+- know what is done with your data
+- know if your data is stored securely
+
+## Authorization vs Authentication
+
+- TODO
+
+## Cybersecurity
+
+Cybersecurity is specifically about the security of digital systems
+
+Typically utilizes the CIA triad:
+
+- Confidentiality
+- Integrity
+- Availability
+
+## Why does Cybersecurity Matter?
+
+Digital systems are extremely prone to theft due to their interconnectivity
+
+- Vulerabilities in public accessible software
+- Contains multitudes of private information
+- Protects valuable resources, like shared infrastructure
+
+## How does this relate to Linux?
+
+96.3% of The top 1 million web-servers run Linux
+
+- Principle of Least Privilege
+- Plenty of multi-user linux systems
+
+# 2: Ways to apply security
+
+## Permission Control
+
+Protect files and services with the correct permissions
+
+- UNIX permissions
+- Separation of concerns
+- Sandboxing
+
+## Symmetric Encryption
+
+Encryption and Decreyption key are the same
+
+- Good for protecting data, but less for communication
+- Like applying a lock on your house
+- Examples include Caesar Cypher or AES
+
+## Symmetric Encryption
+
+- TODO!
+- Put in caesar cypher example in mermaid
+
+## Symmetric Encryption - OpenSSL
+
+This simple script encrypts a single file with AES-256-CBC with a password
+
+```bash
+# Encrypt with a password
+openssl enc -aes-256-cbc -salt -in plaintext.txt -out encrypted.txt
+
+# Decrypt with a password
+openssl enc -d -aes-256-cbc -in encrypted.txt -out decrypted.txt
+```
+
+## Asymmetric Encryption
+
+Works by having different encryption and decryption keys
+
+- Good for establishing secure connections over public channels
+- Utilized by many key exchange algorithms (KEX)
+- Examples include TLS and SSH
+- May utilize public key infrastructure
+
+## Asymmetric Encryption
+
+- Slide on public key encryption
+	- Each party has a private/public key pair. I sign my stuff with my private key in a way where the other side can view the data AND verify that I was the one that sent the data. Make this very clear with a diagram!
+
+- TODO!
+- Put in mermaid proto diagram of KEX / TLS/SSL
+
+## Asymmetric Encryption - SSL Certificates
+
+For this I want to try to do a quick demo where we make a fake CA, sign a cert as that CA, add that CA to Chrome, and then run a go server that uses a signed cert that was handed over via that CA.
+
+I'd like slides that guide this demo.
+
+- TLS handshake slide. How do we secure TCP?
+- Okay, now give a diagram that involves a CA.
+
+## Asymmetric Encryption - Demo
+
+Demo!
+
+- An example of how we can "pretend" to be a CA (I skimmed this and prompted to get something specific, I think this is good but we should double-verify it)
+
+```bash
+# ------------------------------------------------------------
+# STEP 1: Create the CA's private key
+# ------------------------------------------------------------
+# This key represents the root of trust for our fake CA.
+# Anyone who trusts certificates signed by this CA will effectively
+# trust any certificate we issue using this key.
+# We're using 2048-bit RSA for simplicity.
+openssl genrsa -out ca.key 2048
+
+# ------------------------------------------------------------
+# STEP 2: Self-sign a CA certificate
+# ------------------------------------------------------------
+# A CA typically has a self-signed certificate to establish its identity.
+# This command uses the CA's private key to create a corresponding
+# X.509 certificate that is signed by itself.
+# -x509 means "self-signed cert" instead of a CSR
+# -nodes skips encrypting the key (for demo only; not secure in real life)
+# -subj sets the Distinguished Name fields directly (no interactive prompt)
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 365 \
+  -subj "/C=US/ST=Demo/L=Local/O=FakeCA/CN=Fake CA" \
+  -out ca.crt
+
+# ------------------------------------------------------------
+# STEP 3: Create the server's private key
+# ------------------------------------------------------------
+# This is the key belonging to the "applicant" — e.g., a server that wants
+# a TLS certificate. It will remain private to that server.
+openssl genrsa -out server.key 2048
+
+# ------------------------------------------------------------
+# STEP 4: Generate a Certificate Signing Request (CSR)
+# ------------------------------------------------------------
+# The server uses its private key to create a CSR, which includes:
+#   - The public key corresponding to server.key
+#   - Metadata (Subject, CN, etc.)
+#   - A signature proving the server owns the private key
+# This CSR will be sent to the CA for signing.
+openssl req -new -key server.key \
+  -subj "/C=US/ST=Demo/L=Local/O=FakeServer/CN=localhost" \
+  -out server.csr
+
+# ------------------------------------------------------------
+# STEP 5: Sign the server's CSR with the CA to issue a certificate
+# ------------------------------------------------------------
+# Here the CA plays its role:
+#   - It reads the CSR (server.csr)
+#   - It verifies and signs it with its CA key (ca.key)
+#   - It produces a signed server certificate (server.crt)
+# This server.crt can now be presented to clients during TLS handshakes.
+# -CAcreateserial creates ca.srl (serial number file) if it doesn't exist
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+  -out server.crt -days 365 -sha256
+
+# ------------------------------------------------------------
+# STEP 6: Verify the issued certificate against the CA's certificate
+# ------------------------------------------------------------
+# This checks that server.crt is valid and chains correctly to ca.crt.
+# If successful, you'll see: "server.crt: OK"
+openssl verify -CAfile ca.crt server.crt
+```
+
+## Asymmetric Encryption - Demo
+
+And a simple `go` server (intentionally using low level primitives) that uses a cert.
+
+```go
+package main
+
+import (
+	"crypto/tls"
+	"fmt"
+)
+
+func main() {
+	// Load the TLS certificate and private key from disk.
+	// These are the credentials the server will present during the TLS handshake.
+	// server.crt = public certificate; server.key = private key.
+	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a TLS configuration object using the loaded certificate.
+	// This defines how the TLS handshake should work and what credentials to use.
+	cfg := &tls.Config{Certificates: []tls.Certificate{cert}}
+
+	// Start a TCP listener wrapped in TLS on port 8443.
+	// tls.Listen() does the normal TCP listen + wraps new connections with TLS.
+	ln, err := tls.Listen("tcp", ":8443", cfg)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Listening on https://localhost:8443/")
+
+	for {
+		// Wait for a new TLS connection (client TCP connect + TLS handshake).
+		conn, err := ln.Accept()
+		if err != nil {
+			// If something goes wrong accepting a connection, skip it and continue.
+			continue
+		}
+
+		// Handle each connection concurrently in a goroutine.
+		go func(c tls.Conn) {
+			defer c.Close()
+
+			// Read the incoming data (the HTTP request) into a buffer.
+			// We don't parse it here — we just read enough to clear it from the socket.
+			buf := make([]byte, 4096)
+			c.Read(buf)
+
+			// Prepare a simple HTTP/1.1 200 OK response.
+			body := []byte("hello over tls\n")
+			fmt.Fprintf(
+				&c,
+				"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\nConnection: close\r\n\r\n",
+				len(body),
+			)
+
+			// Send the body and close the connection.
+			c.Write(body)
+		}(*conn.(*tls.Conn))
+	}
+}
+```
+
+# 3: General good practices
+
+## 2FA
+### TOTP 
+- How does TOTP work
+- A system diagram of TOTP
+- Including some nitty-gritty here
+
+### Yubikey
+- How does Yubikey work
+- A system diagram
+- If this is complicated (no idea how it works) then we can skip
