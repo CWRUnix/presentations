@@ -27,10 +27,6 @@ Privacy is a right
 - know what is done with your data
 - know if your data is stored securely
 
-## Authorization vs Authentication
-
-- TODO
-
 ## Cybersecurity
 
 Cybersecurity is specifically about the security of digital systems
@@ -74,11 +70,6 @@ Encryption and Decreyption key are the same
 - Like applying a lock on your house
 - Examples include Caesar Cypher or AES
 
-## Symmetric Encryption
-
-- TODO!
-- Put in caesar cypher example in mermaid
-
 ## Symmetric Encryption - OpenSSL
 
 This simple script encrypts a single file with AES-256-CBC with a password
@@ -102,20 +93,30 @@ Works by having different encryption and decryption keys
 
 ## Asymmetric Encryption
 
-- Slide on public key encryption
-	- Each party has a private/public key pair. I sign my stuff with my private key in a way where the other side can view the data AND verify that I was the one that sent the data. Make this very clear with a diagram!
+::: {.columns}
+::: {.column}
 
-- TODO!
-- Put in mermaid proto diagram of KEX / TLS/SSL
+TLS handshake and key exchange
 
-## Asymmetric Encryption - SSL Certificates
-
-For this I want to try to do a quick demo where we make a fake CA, sign a cert as that CA, add that CA to Chrome, and then run a go server that uses a signed cert that was handed over via that CA.
-
-I'd like slides that guide this demo.
-
-- TLS handshake slide. How do we secure TCP?
-- Okay, now give a diagram that involves a CA.
+:::
+::: {.column}
+```{mermaid}
+sequenceDiagram
+    User->>Server: SYN
+    Server->>User: SYNACK
+    User->>Server: ACK
+    User->>Server: Hello (Random seed)!
+    Server->>User: Hello (Random seed)!
+    Server->>User: Public Key
+    Server->>User: I am done Helloing
+    User->>Server: Public Key
+    User->>Server: Cipher Parameters (TLS 1.2)
+    User->>Server: Done!
+    Server->>User: Cipher Parameters (TLS 1.2)
+    Server->>User: Done!
+```
+:::
+:::
 
 ## Asymmetric Encryption - Demo
 
