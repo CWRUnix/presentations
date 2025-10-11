@@ -69,175 +69,6 @@ graph TB
 
 # 2: OSI Layers
 
-## Physical
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-|  Pres.  |
-|  Sess.  |
-| Transp. |
-|  Netw.  |
-|  Data.  |
-| ***--- Phys. ---*** |
-| |
-:::
-:::{.column width="75%"}
-The physical medium that physically transports data between two devices.
-
-Could be:
-
-- Copper wires
-- Fiber optic
-- Radio
-- Lasers
-- Birds
-:::
-:::
-
-## Data Link
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-|  Pres.  |
-|  Sess.  |
-| Transp. |
-|  Netw.  |
-| ***--- Data. ---*** |
-|  Phys.  |
-| |
-:::
-:::{.column width="75%"}
-The language that physical devices speak to each other. This is typically highly linked to the physical layer.
-
-- Ethernet is typically spoken over multiple strands of copper
-- WiFi is typically used when using radio
-- PPP (Point to Point Protocol) was used for things like Dial-Up
-:::
-:::
-
-## Network
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-|  Pres.  |
-|  Sess.  |
-| Transp. |
-| ***--- Netw. ---*** |
-|  Data.  |
-|  Phys.  |
-| |
-:::
-:::{.column width="75%"}
-Manages how information is addressed and sent to the correct destination, down the fastest available route
-
-This includes:
-
-- IP (Internet Protocol)
-- PIM/IP (Protocol Indepedent Multicast)
-- ICMP (Internet Control Management)
-- IGMP (Internet Group Management)
-- IPsec (IP Security)
-
-:::
-:::
-
-## Transport
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-|  Pres.  |
-|  Sess.  |
-| ***--- Transp. ---*** |
-|  Netw.  |
-|  Data.  |
-|  Phys.  |
-| |
-:::
-:::{.column width="75%"}
-Manages exactly how packets are reliably sent to and from the target. Typically, only TCP (Transmossion Control) or UDP (User Datagram) are used.
-
-Has to manage:
-
-- Segmentation
-- Flow Control
-- Error / Loss
-- Multiplexing
-:::
-:::
-
-## Session
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-|  Pres.  |
-| ***--- Sess. ---*** |
-| Transp. |
-|  Netw.  |
-|  Data.  |
-|  Phys.  |
-| |
-:::
-:::{.column width="75%"}
-Manages keeping sessions open on devices. This ensures that ports remain open when you have an active connection. Not many protocols utilize this much anymore.
-
-- RPC (Remote Procedure Call)
-- SAP (Session Announcement)
-- SIP (Session Initiation)
-- Sometimes TCP/SSL
-
-:::
-:::
-
-## Presentation
-
-:::{.columns}
-:::{.column width="25%"}
-| |
-| :-----: |
-| |
-|   App   |
-| ***--- Pres. ---*** |
-|  Sess.  |
-| Transp. |
-|  Netw.  |
-|  Data.  |
-|  Phys.  |
-| |
-:::
-:::{.column width="75%"}
-Manages converting data that is sent into data that is usable for applications.
-
-Handles:
-
-- Translation
-- Encryption
-- Compression
-- Serialization
-
-This includes character encoding, SSL, and MIME.
-:::
-:::
-
 ## Application
 
 :::{.columns}
@@ -281,25 +112,554 @@ Any application that requires networking will be on this layer including meta-pr
 :::
 :::
 
-# 3: Linux Concepts of Networking
+## Presentation
 
-- Virtual Devices
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+| ***--- Pres. ---*** |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages converting data that is sent into data that is usable for applications.
+
+Handles:
+
+- Translation
+- Encryption
+- Compression
+- Serialization
+
+This includes character encoding, SSL, and MIME.
+:::
+:::
+
+## Session
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+| ***--- Sess. ---*** |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages keeping sessions open on devices. This ensures that ports remain open when you have an active connection. Not many protocols utilize this much anymore.
+
+- RPC (Remote Procedure Call)
+- SAP (Session Announcement)
+- SIP (Session Initiation)
+- Sometimes TCP/SSL
+
+:::
+:::
+
+## Transport
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages exactly how packets are reliably sent to and from the target. Typically, only TCP (Transmossion Control) or UDP (User Datagram) are used.
+
+Has to manage:
+
+- Segmentation
+- Flow Control
+- Error / Loss
+- Multiplexing
+:::
+:::
+
+## Network
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages how information is addressed and sent to the correct destination, down the fastest available route
+
+This includes:
+
+- IP (Internet Protocol)
+- PIM/IP (Protocol Indepedent Multicast)
+- ICMP (Internet Control Management)
+- IGMP (Internet Group Management)
+- IPsec (IP Security)
+
+:::
+:::
+
+## Data Link
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+The language that physical devices speak to each other. This is typically highly linked to the physical layer.
+
+- Ethernet is typically spoken over multiple strands of copper
+- WiFi is typically used when using radio
+- PPP (Point to Point Protocol) was used for things like Dial-Up
+:::
+:::
+
+## Physical
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+| ***--- Phys. ---*** |
+| |
+:::
+:::{.column width="75%"}
+The physical medium that physically transports data between two devices.
+
+:::{}
+:::{.columns}
+:::{.column width="50%"}
+Could be:
+
+- Copper wires
+- Fiber optic
+- Radio
+- Lasers
+- Birds
+:::
+:::{.column width="50%"}
+![](5/Underwater.jpg)
+:::
+:::
+:::
+
+:::
+:::
+
+# 3: Implementations of Specific Protocols
+
+## Ethernet
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+| ***--- Phys. ---*** |
+| |
+:::
+:::{.column width="75%"}
+Typically represented with the symbol `<···>`
+
+Sends electrical pulses down twisted pairs.
+
+Uses line encoding like `Manchester`, `8b/10b`, or `PAM-5` for gigabit.
 
 
-# 4: Implementations of Specific Protocols
+:::
+:::
 
 ## Ethernet
 
 :::{.columns}
 :::{.column width="50%"}
-Typically represented with the symbol`<···>`
-
-Sends electrical pulses down twisted pairs.
-
-Uses line encoding like `Manchester`, `8b/10b`, or `PAM-5` for gigabit.
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+| ***--- Phys. ---*** |
+| |
 :::
 :::{.column width="50%"}
-PUT IN IMAGE OF ETHERNET CABLE HERE
+![](./5/ethernet.svg)
 :::
 :::
 
+## IP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+The IP is a way to tell devices where to send information. It encapsulates pieces of information as packets, or a small piece of data with metadata.
+
+In the packet, it includes:
+
+- Version, Length
+- Identification, Flags, Fragment number
+- TTL, Protocol, Checksum
+- Source, Destination
+- The data being sent
+
+:::
+:::
+
+## Multicasting / Unicasting
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Multicasting allows you to send a packet to multiple recipients without the overhead of needing to send it multiple times to multiple people.
+
+Utilizes IGMP to subscribe to groups and PIM to send messages to groups.
+
+:::
+:::
+## NAT
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+NAT isn't really totally new but it totally dominates everything now since we don't have enough IPs for every computer, TV, and microwave in the world.
+
+It translates the IP header in order to make sure that packets get routed properly across subnets.
+:::
+:::
+
+
+## TCP/UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+A brief comparison between TCP and UDP.
+
+| Feature     | TCP                           | UDP                    |
+| ----------- | ----------------------------- | ---------------------- |
+| Connection  | 3-way handshake + termination | Connectionless         |
+| Reliability | Reliable                      | Unreliable             |
+| Ordering    | Guaranteed                    | Not guaranteed         |
+| Speed       | Slower (more overhead)        | Faster (less overhead) |
+
+:::
+:::
+
+## TCP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+Transmission Control Protocol is a way to send information and ensure reliability. Typically is slower than UDP due to the higher overhead.
+
+It ensures:
+
+- Packets are recieved
+- Packets are in order
+- Sessions and discussions are opened and closed
+:::
+:::
+
+## TCP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+![](5/TCP.svg)
+:::
+:::
+
+## UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+User Datagram Protocol is the way to quickly send information from one place to another without ensuring that the recipient has recieved it or not.
+:::
+:::
+
+## UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+![](5/UDP.svg)
+:::
+:::
+
+## QUIC
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+| ***--- Pres. ---***  |
+| ***--- Sess. ---*** |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+A new protocol built on top of UDP that manages encryption, transport, and resilience.
+
+It essentially does TLS like packet routing, but specifically for HTTP and over UDP.
+
+This allows QUIC to be quick, yet still make sure things get to where it needs to be.
+:::
+:::
+
+# 3.1: Application Protocols
+
+## BGP
+
+Border Gateway Protocol is a way for nodes to communicate the fastest routes to route IP packets. The communication itself is on the application layer, even if it influences how devices route things on the Network level.
+
+- Works by advertising to nearby nodes distances/weights to specific IP addresses
+- Uses TCP on port 179
+- Not very secure and is prone to poisoning
+
+## DNS
+
+The Domain Name System is a protocol for resolving domain names into IP addresses. Since the internet itself doesn't directly route traffic to domains, yet people prefer domains due to their ease of memorization.
+
+- Operated by having centralized servers holding domain info
+- Multiple types of data can be associated with domains
+- Typically used to map domains to IPs
+
+## DNS
+
+:::{.small-table}
+| Type      | Name           | Purpose / What it Returns                                   | Common Use Case                                |
+| --------- | -------------- | ----------------------------------------------------------- | ---------------------------------------------- |
+| **A**     | Address        | IPv4 address (e.g. `93.184.216.34`)                         | Standard hostname → IPv4 lookup                |
+| **AAAA**  | IPv6 Address   | IPv6 address (e.g. `2606:2800:220:1:248:1893:25c8:1946`)    | Hostname → IPv6 lookup                         |
+| **CNAME** | Canonical Name | Alias pointing to another hostname                          | Domain redirection / aliases (e.g. www → root) |
+| **TXT**   | Text           | Arbitrary text strings (SPF, DKIM, site verification, etc.) | Email authentication, domain verification      |
+| **MX**    | Mail Exchange  | Mail server hostname + priority                             | Email routing                                  |
+| **NS**    | Name Server    | Authoritative nameservers for a zone                        | Delegation and zone management                 |
+| **PTR**   | Pointer        | Reverse DNS (IP → hostname)                                 | Reverse lookups, rDNS checks                   |
+:::
+
+## HTTP
+
+HyperText Transfer Protocol text based protocol for exchanging Hypertext information, more commonly known as websites.
+
+Structured as a status, options, and body all in pure text.
+
+## HTTP
+
+::: {.columns}
+::: {.column}
+Request Header
+
+:::{.small-table}
+|         |                      |                    |
+| ------- | -------------------- | ------------------ |
+| Status  | `POST / HTTP/1.1`    |                    |
+| Options | `Host:`              | `example.com`      |
+|         | `User-Agent:`        | `curl/8.6.0`       |
+|         | `Content-Type:`      | `application/json` |
+|         | `Content-Length:`    | `345`              |
+| Body    | `{"data": "ABC123"}` |                    |
+:::
+:::
+::: {.column}
+Response Header
+
+:::{.small-table}
+|         |                          |                                 |
+| ------- | ------------------------ | ------------------------------- |
+| Status  | `HTTP/1.1 403 Forbidden` |                                 |
+| Options | `Server:`                | `Apache`                        |
+|         | `Date:`                  | `Sat, 11 Oct 2025 16:21:30 EST` |
+|         | `Content-Type:`          | `text/html`                     |
+|         | `Content-Length:`        | `582`                           |
+|         | `Cache-Control:`         | `no-store`                      |
+| Body    | `<!DOCTYPE html>...`     |                                 |
+:::
+:::
+:::
+
+## HTTP
+
+There are plenty more options that can be put in the headers, including:
+
+- CORS headers
+- Cookies
+- Referrers
+- Protocol Upgrade
+- X-Forwarded information
+
+## WebRTC
+
+TODO
+
+## WebTransport
+
+TODO
+
+# 4: Linux Concepts of Networking
+
+- Virtual Devices
+- Sockets
+- Virtual Ethernets
+- Reverse proxies
+
+TODO
