@@ -10,6 +10,7 @@
   which,
   python3,
   pythonPkg,
+  dejavu_fonts,
   ...
 }:
 stdenv.mkDerivation {
@@ -30,6 +31,7 @@ stdenv.mkDerivation {
   ];
 
   buildPhase = ''
+    ln -s ${dejavu_fonts} fonts
     mkdir home
     export HOME=$(realpath ./home)
     quarto render .

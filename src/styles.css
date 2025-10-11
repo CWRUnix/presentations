@@ -47,3 +47,10 @@ marquee {
   height: 90%;
   width: 100%;
 }
+
+@font-face {
+    font-family: 'DejaVu Sans';
+    src: url('https://github.com/web-fonts/dejavu-sans/raw/refs/heads/master/fonts/dejavu-sans-webfont.woff2') format('woff2'),
+      url('https://github.com/web-fonts/dejavu-sans/raw/refs/heads/master/fonts/dejavu-sans-webfont.woff') format('woff'),
+      url('https://github.com/web-fonts/dejavu-sans/raw/refs/heads/master/fonts/dejavu-sans-webfont.ttf') format('trutype');
+}
