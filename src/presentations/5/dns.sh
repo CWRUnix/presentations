@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
 set -euo pipefail
 
 DOMAIN=case.eduu
@@ -32,4 +31,3 @@ class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *args): pass
 socketserver.TCPServer(('', 80), H).serve_forever()
 PY
-

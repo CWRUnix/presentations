@@ -337,7 +337,7 @@ Uses line encoding like `Manchester`, `8b/10b`, or `PAM-5` for gigabit.
 | |
 :::
 :::{.column width="50%"}
-![](./5/ethernet.svg)
+![](./5/imgs/ethernet.svg)
 :::
 :::
 
@@ -493,7 +493,7 @@ It ensures:
 | |
 :::
 :::{.column width="75%"}
-![](5/TCP.svg)
+![](./5/imgs/TCP.svg)
 :::
 :::
 
@@ -536,7 +536,7 @@ User Datagram Protocol is the way to quickly send information from one place to 
 | |
 :::
 :::{.column width="75%"}
-![](5/UDP.svg)
+![](./5/imgs/UDP.svg)
 :::
 :::
 
@@ -664,13 +664,13 @@ The Domain Name System is a protocol for resolving domain names into IP addresse
 ## DNS - Packet
 
 ::: {.r-stack}
-![](5/DNS.svg)
+![](./5/imgs/DNS.svg)
 :::
 
 ## DNS - Flags
 
 ::: {.r-stack}
-![](5/DNS_flags.svg){width="700"}
+![](./5/imgs/DNS_flags.svg){width="700"}
 :::
 
 :::{.center}
@@ -978,7 +978,7 @@ MAC: Signature of encrypted packet
 Padding: Necessary to not leak info and normalize packet size
 
 ::: {.r-stack}
-![](5/SSH_transport.svg){width="700"}
+![](./5/imgs/SSH_transport.svg){width="700"}
 :::
 
 ## SSH - User Authentication
