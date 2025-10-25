@@ -921,14 +921,6 @@ socketserver.TCPServer(('', 80), H).serve_forever()
 PY
 ```
 
-## BGP
-
-Border Gateway Protocol is a way for nodes to communicate the fastest routes to route IP packets. The communication itself is on the application layer, even if it influences how devices route things on the Network level.
-
-- Works by advertising to nearby nodes distances/weights to specific IP addresses
-- Uses TCP on port 179
-- Not very secure and is prone to poisoning
-
 ## SSH
 
 SSH is used for remote access to other computers, additionally allowing the transfer of files, port fowarding, and multiplexing.
@@ -1410,9 +1402,18 @@ A ping is a heartbeat. What is a heartbeat?
 
 It's just "I'm still here, pls do not close my connection <3"
 
-## IGMP
+
+## BGP
 
 Next week!
+
+Border Gateway Protocol is a way for nodes to communicate the fastest routes to route IP packets. The communication itself is on the application layer, even if it influences how devices route things on the Network level.
+
+- Works by advertising to nearby nodes distances/weights to specific IP addresses
+- Uses TCP on port 179
+- Not very secure and is prone to poisoning
+
+## IGMP
 
 ## WebRTC
 
