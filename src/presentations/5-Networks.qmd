@@ -659,6 +659,7 @@ The Domain Name System is a protocol for resolving domain names into IP addresse
 - Operated by having centralized servers holding domain info
 - Multiple types of data can be associated with domains
 - Typically used to map domains to IPs
+- Typically operates over UDP, however can operate over TCP, or even HTTP(s)
 
 ## DNS - Packet
 
@@ -929,6 +930,140 @@ Border Gateway Protocol is a way for nodes to communicate the fastest routes to 
 - Not very secure and is prone to poisoning
 
 ## SSH
+
+SSH is used for remote access to other computers, additionally allowing the transfer of files, port fowarding, and multiplexing.
+
+The `SSH` overarching concept is split into 3 separate protocols:
+
+- Transport Layer Protocol (`SSH-TRANS`)
+- User Authentication Protocol (`SSH-USERAUTH`)
+- Connection Protocol (`SSH-CONN`)
+
+SSH typically operates over TCP over port 22.
+
+## SSH - Transport Layer
+
+The SSH transport layer is responsible for managing and encrypting the session between the client and the server.
+
+- All other parts of SSH run on top of this layer
+- Diffie-Hellman Key Exchange (DH-KEX) happens before authentication
+- Once a symmetric key is obtained, all communications are fully encrypted with this key
+
+## SSH - User Authentication
+
+This portion of SSH is to validate that the client is a permitted user of the system, this follows your SSH config and verifies your identity with one of:
+
+- Password (bad)
+- SSH Public/Private key (good)
+- PAM (good)
+
+Note that if using a keypair here, it is never used for the encryption of the session, it only exists for the authentication of the user.
+
+## SSH - Connection
+
+Once a user is authenticated, then any amount of connections may be opened across the transport. SSH supports many kinds of connections, including:
+
+- Session (terminal)
+- X11 forwarding
+- SCP/SFTP
+- Tunneling
+- Custom Subsystems (for nonstandard traffic)
+
+## SSH - Transport Packet
+
+Packet Length: Size of encrypted packet
+
+MAC: Signature of encrypted packet
+
+Padding: Necessary to not leak info and normalize packet size
+
+::: {.r-stack}
+![](5/SSH_transport.svg){width="700"}
+:::
+
+## SSH - User Authentication
+
+These are the supported messages for User Authentication, each messsage has its own packet structure
+
+::: {.r-stack}
+:::{.small-table}
+| Type                         | Numeric | Direction | Description                    |
+| ---------------------------- | ------- | --------- | ------------------------------ |
+| **SSH_MSG_USERAUTH_REQUEST** | 50      | C→S       | Client requests authentication |
+| **SSH_MSG_USERAUTH_FAILURE** | 51      | S→C       | Server denies authentication   |
+| **SSH_MSG_USERAUTH_SUCCESS** | 52      | S→C       | Server accepts authentication  |
+| **SSH_MSG_USERAUTH_BANNER**  | 53      | S→C       | Optional banner message        |
+:::
+:::
+
+## SSH - User Authentication Example
+
+Here is an example of starting the authentication with username "alice" with password "hunter2"
+
+Sample `SSH_MSG_USERAUTH_REQUEST` payload:
+
+::: {.r-stack}
+:::{.small-table}
+| Portion        | Type                            | Value                                        |
+| -------------- | ------------------------------- | -------------------------------------------- |
+| **Message**    | `byte`                          | `50` (SSH_MSG_USERAUTH_REQUEST)              |
+| **Username**   | `length (uint32), char[length]` | `00 00 00 05 61 6c 69 63 65` (alice)         |
+| **Service**    | `length (uint32), char[length]` | "ssh-connection"                             |
+| **Method**     | `length (uint32), char[length]` | "password"                                   |
+| **Change PW**  | `boolean (byte)`                | `0x00`                                       |
+| **Auth Value** | `length (uint32), char[length]` | `00 00 00 07 68 75 6e 74 65 72 32` (hunter2) |
+:::
+:::
+
+This value would then be sent as the payload of the transport packet.
+
+## SSH - Connection
+
+These are the valid messages for managing channels. Note that you are only allowed to manage channels after authentication is complete.
+
+:::{.r-stack}
+:::{.small-table}
+| Type                                  | Numeric |
+| ------------------------------------- | ------- |
+| **SSH_MSG_CHANNEL_OPEN**              | 90      |
+| **SSH_MSG_CHANNEL_OPEN_CONFIRMATION** | 91      |
+| **SSH_MSG_CHANNEL_OPEN_FAILURE**      | 92      |
+| **SSH_MSG_CHANNEL_WINDOW_ADJUST**     | 93      |
+| **SSH_MSG_CHANNEL_DATA**              | 94      |
+| **SSH_MSG_CHANNEL_EXTENDED_DATA**     | 95      |
+| **SSH_MSG_CHANNEL_EOF**               | 96      |
+| **SSH_MSG_CHANNEL_CLOSE**             | 97      |
+| **SSH_MSG_CHANNEL_REQUEST**           | 98      |
+| **SSH_MSG_CHANNEL_SUCCESS**           | 99      |
+| **SSH_MSG_CHANNEL_FAILURE**           | 100     |
+:::
+:::
+
+## SSH - Connection Example
+
+This is how we would begin a text session after authenticating on channel number `0`, since SSH allows multiplexing:
+
+::: {.r-stack}
+:::{.small-table}
+| Portion             | Type                            | Value                       |
+| ------------------- | ------------------------------- | --------------------------- |
+| **Message**         | `byte`                          | `90` (SSH_MSG_CHANNEL_OPEN) |
+| **Channel Type**    | `length (uint32), char[length]` | "session"                   |
+| **Sender Channel**  | `uint32`                        | `0x0000 0000`               |
+| **Window Size**     | `uint32`                        | `0x0020 0000` (2MiB)        |
+| **Max Packet Size** | `uint32`                        | `0x0000 8000`               |
+:::
+:::
+
+## SSH - Data Transfer Example
+
+Lastly, we can finally send actual data over a connection, whether it be our session, files, or forwarding a port.
+
+| Portion               | Type     | Value                       |
+| --------------------- | -------- | --------------------------- |
+| **Message**           | `byte`   | `94` (SSH_MSG_CHANNEL_DATA) |
+| **Recieving Channel** | `uint32` | `0x0000 0000`               |
+| **Data**              | `string` |                             |
 
 ## IGMP
 
