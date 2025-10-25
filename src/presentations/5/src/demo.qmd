@@ -8,7 +8,7 @@ https://developer.mozilla.org/en-US/docs/Web/API
 
 The syscalls of the internet!
 
-# Fetching Weather Data
+## Fetching Weather Data
 
 ```javascript
 fetch('https://wttr.in/Cleveland?format=j1')
@@ -21,7 +21,7 @@ fetch('https://wttr.in/Cleveland?format=j1')
   .catch(error => console.error('Error:', error));
 ```
 
-# Recall HTTP
+## Recall HTTP
 
 ```http
 GET /api/users/123 HTTP/1.1\r\n
@@ -47,7 +47,7 @@ Server sent events!!
 
 https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 
-# What are they?
+## What are they?
 
 An easy way to be fed EVENTs from a server
 
@@ -71,14 +71,19 @@ eventSource.onmessage = function(event) {
 | **Error Handling** | Promise-based | Event-based |
 | **Use Case** | API calls, file uploads | Live updates, notifications |
 
-# How do they work?
+## How do they work?
 
-> You: "hey, I want to connect to you and then talk over WebSocket. Here's a challenge to prove you are worthy"
-> Server: "yep yep, let's do it! I completed your challenge."
-> You: Okay, here's a FRAME for message #1
-> Server: Okay great, here a FRAME for MY message #1
-> You: Ok let's close for (reason). Opcode 8!
-> Server: ~closes tcp~
+1. You: "hey, I want to connect to you and then talk over WebSocket. Here's a challenge to prove you are worthy"
+1. Server: "yep yep, let's do it! I completed your challenge."
+1. You: Okay, here's a FRAME for message #1
+1. Server: Okay great, here a FRAME for MY message #1
+1. You: Ok let's close for (reason). Opcode 8!
+1. Server: ~closes tcp~
+
+## Example!
+
+**How do we fragment?**
+(p.s. why do we fragment?)
 
 ```
 WebSocket fragmented message (server → client)
@@ -114,9 +119,7 @@ Breakdown:
 
 ───────────── Combined payload ─────────────
 "Hello, " + "world" = "Hello, world"
-`
-
-## How do we fragment?
+```
 
 ## Client -> server:
 
@@ -168,7 +171,7 @@ We don't need an `id`, but we lose deduplication and auto-resume :(
 
 RFC nitty gritty!
 
-# I want to talk!
+## I want to talk!
 
 **WebSocket Handshake** (RFC 6455 §1.3)
 
@@ -206,7 +209,7 @@ Sec-WebSocket-Version: 13\r\n
   - GUID = `258EAFA5-E914-47DA-95CA-C5AB0DC85B11`
 - Echoes accepted extensions (if any)
 
-# Extension Negotiation (RFC 6455 §9)
+## Extension Negotiation (RFC 6455 §9)
 
 > WebSocket extensions allow endpoints to modify how frames are interpreted  
 > (e.g., compression, multiplexing) without breaking protocol compatibility.
@@ -214,6 +217,8 @@ Sec-WebSocket-Version: 13\r\n
 
 > During the **opening handshake**, the client proposes extensions via the  
 > `Sec-WebSocket-Extensions` header:
+
+## Let's see it
 
 ```
 GET /chat HTTP/1.1
@@ -240,7 +245,7 @@ Sec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover
 (Ignores x-super-mux (not supported))
 Adds its own parameter (server_no_context_takeover).
 
-# Frames
+## Frames
 
 ```
 0                   1                   2                   3
@@ -271,16 +276,18 @@ Use RSV1 to say "Yes i am compressed!!"
 
 https://datatracker.ietf.org/doc/html/rfc7692
 
-This document specifies a framework for adding compression
-functionality to the WebSocket Protocol [RFC6455].  The framework
-specifies how to define WebSocket Per-Message Compression Extensions
-(PMCEs) for a compression algorithm based on the extension concept of
-the WebSocket Protocol specified in Section 9 of [RFC6455].  A
-WebSocket client and a peer WebSocket server negotiate the use of a
-PMCE and determine the parameters required to configure the
-compression algorithm during the WebSocket opening handshake.  The
-client and server can then exchange data messages whose frames
-contain compressed data in the payload data portion.
+```
+ This document specifies a framework for adding compression
+ functionality to the WebSocket Protocol [RFC6455].  The framework
+ specifies how to define WebSocket Per-Message Compression Extensions
+ (PMCEs) for a compression algorithm based on the extension concept of
+ the WebSocket Protocol specified in Section 9 of [RFC6455].  A
+ WebSocket client and a peer WebSocket server negotiate the use of a
+ PMCE and determine the parameters required to configure the
+ compression algorithm during the WebSocket opening handshake.  The
+ client and server can then exchange data messages whose frames
+ contain compressed data in the payload data portion.
+```
 
 # Big Frames
 
@@ -302,14 +309,16 @@ the negotiated extensions defines the meaning of such a nonzero
 value, the receiving endpoint MUST _Fail the WebSocket
 Connection_.
 
+:::{.small-table .r-stack}
 | Frame | Opcode | FIN | Meaning | Identification |
 |-------|--------|-----|---------|----------------|
 | #1 | 0x2 (binary) | 0 | First fragment | Opcode != 0x0, FIN = 0 |
 | #2 | 0x0 (continuation) | 0 | Middle fragment | Opcode = 0x0, FIN = 0 |
 | #3 | 0x0 (continuation) | 1 | Final fragment | Opcode = 0x0, FIN = 1 |
+:::
 
 
-# Opcodes
+## Opcodes
 
 ```
 Opcode:  4 bits
