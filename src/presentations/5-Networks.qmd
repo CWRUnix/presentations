@@ -690,7 +690,7 @@ The Domain Name System is a protocol for resolving domain names into IP addresse
 :::
 :::
 
-## DNS - Question
+## DNS - Question (???)
 
 | Portion of Question | Size     | Meaning                            |
 | ------------------- | -------- | ---------------------------------- |
@@ -706,7 +706,7 @@ Formatted as groups of labels, followed by a null byte:
 
 `www.example.com` has 3 labels: `www`, `example`, `com`
 
-Each label is formatted as the length, followed by the data:
+Each label is formatted as the length, in UTF-8, followed by the data:
 
 `www` -> `03 77.77.77`
 
@@ -767,18 +767,18 @@ All DNS answers (Answer/Authority/Other) are formatted as RRs (Resource Records)
 
 Lets query the IP for `www.example.com`!
 
-:::{.small-table}
-| Portion              | Value                                              |
-| -------------------- | -------------------------------------------------- |
-| **TxID**             | `0x1234`                                           |
-| **Flags**            | `0x0100` (`0000 0001 0000 0000`) Request Recursion |
-| **# Questions**      | `0x0001`                                           |
-| **# Answers**        | `0x0000`                                           |
-| **# Authoritative**  | `0x0000`                                           |
-| **# Other**          | `0x0000`                                           |
-| **Question - Name**  | `0x03777777076578616d706c6503636f6d00`             |
-| **Question - Type**  | `0x0001` (`A` Query)                               |
-| **Question - Class** | `0x0001` (`IN` Class)                              |
+:::{.small-table .r-stack}
+| Portion              | Value                                                    |
+| -------------------- | -------------------------------------------------------- |
+| **TxID**             | `0x1234`                                                 |
+| **Flags**            | `0x0100` (`0000 0001 0000 0000`) Request Recursion       |
+| **# Questions**      | `0x0001`                                                 |
+| **# Answers**        | `0x0000`                                                 |
+| **# Authoritative**  | `0x0000`                                                 |
+| **# Other**          | `0x0000`                                                 |
+| **Question - Name**  | `0x03777777076578616d706c6503636f6d00` (www.example.com) |
+| **Question - Type**  | `0x0001` (`A` Query)                                     |
+| **Question - Class** | `0x0001` (`IN` Class)                                    |
 :::
 
 ```bash
@@ -788,7 +788,7 @@ echo "$QUERY" | xxd -r -p | nc -u -w1 8.8.8.8 53 | xxd
 
 ## DNS - Decode
 
-```
+```plaintext
       Header
 
 1234 8180
@@ -862,6 +862,31 @@ We see that the returned data includes:
 - IP addresses
   - `23.205.89.16`
   - `23.205.89.33`
+
+## DNS Authoritative vs Recusive Resolvers
+
+Authoritative DNS servers hold the original master copy of a DNS record. This is the server that the `NS` record resolves to!
+
+Recursive (or caching) DNS servers are typically closer to the place you are querying from, allowing for faster response speeds and lower load. When these servers do no have the DNS record in query, it will recursively query its own DNS server until a response is returned.
+
+## DNS Authoritative vs Recusive Resolvers
+
+::: {.r-stack}
+![](./5/imgs/DNS_recursive.svg){width="700"}
+:::
+
+## DNS Poisoning
+
+Since DNS operates over UDP and does NOT do any kinda of cryptographic verification or validation, DNS is succeptible to poisoning attacks.
+
+- This is when you send a UDP packet to a DNS server claiming you contain an update to a DNS record, while you fill in the record with whatever information you want
+- This means the DNS server will cache an incorrect record and relay this information to whoever else queries this server.
+
+## DNS Poisoning
+
+::: {.r-stack}
+![](./5/imgs/DNS_poison.svg){width="700"}
+:::
 
 ## DNS
 
@@ -948,6 +973,7 @@ This portion of SSH is to validate that the client is a permitted user of the sy
 - Password (bad)
 - SSH Public/Private key (good)
 - PAM (good)
+- CWRUnix PAM (very very good!)
 
 Note that if using a keypair here, it is never used for the encryption of the session, it only exists for the authentication of the user.
 
