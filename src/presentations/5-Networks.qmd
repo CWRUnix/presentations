@@ -946,6 +946,10 @@ socketserver.TCPServer(('', 80), H).serve_forever()
 PY
 ```
 
+# SSH!
+
+---
+
 ## SSH
 
 SSH is used for remote access to other computers, additionally allowing the transfer of files, port fowarding, and multiplexing.
@@ -965,6 +969,18 @@ The SSH transport layer is responsible for managing and encrypting the session b
 - All other parts of SSH run on top of this layer
 - Diffie-Hellman Key Exchange (DH-KEX) happens before authentication
 - Once a symmetric key is obtained, all communications are fully encrypted with this key
+
+## SSH - Transport Layer
+
+When establishing a connection, a shared secret will be derived from your nonce and random primes, which power the Diffie Hellman key exchange algorithm. This symmetric key will be used to encrypt all SSH packets from now on.
+
+Possible Symmetric key encryption algorithms SSH can use:
+
+- AES
+- Blowfish
+- 3DES
+- CAST128
+- Arcfour
 
 ## SSH - User Authentication
 
@@ -987,17 +1003,77 @@ Once a user is authenticated, then any amount of connections may be opened acros
 - Tunneling
 - Custom Subsystems (for nonstandard traffic)
 
+## SSH - Packet Flow
+
+When establishing a connection, the first thing that is sent is your version string, which must be of the following form:
+
+`SSH-{proto-version}-{software-name-and-version}\r\n`
+
+This is send unencrypted and as raw ASCII over a TCP packet.
+
+After version numebers are exchanged, everything else will be sent over the transport layer packet protocol.
+
 ## SSH - Transport Packet
 
 Packet Length: Size of encrypted packet
 
-MAC: Signature of encrypted packet
+MAC: Signature of encrypted packet (when packets are encrypted)
 
 Padding: Necessary to not leak info and normalize packet size
 
 ::: {.r-stack}
 ![](./5/imgs/SSH_transport.svg){width="700"}
 :::
+
+## SSH - Key Exchange Packets
+
+There are a few kinds of key exchange packets that need to be sent before full encryption is established:
+
+These packets are NOT encrypted when sent, but it does not weaken the connection.
+
+::: {.r-stack}
+:::{.small-table}
+| Type                      | Numeric | Direction | Description                     |
+| ------------------------- | ------- | --------- | ------------------------------- |
+| **SSH_MSG_KEXINIT**       | 20      | Both      | Exchange possible key exchanges |
+| **SSH_MSG_KEXDH_INIT**    | 30      | C→S       | DH init packet                  |
+| **SSH_MSG_KEX_ECDH_INIT** | 30      | C→S       | DH-EC init packet               |
+| **SSH_MSG_KEXDH_REPLY**   | 31      | S→C       | DH Reply packet                 |
+| **SSH_MSG_ECDH_REPLY**    | 31      | S→C       | DH Reply packet                 |
+| **SSH_MSG_NEWKEYS**       | 21      | Both      | Begin using encryption!         |
+:::
+:::
+
+## SSH - KEXINIT example
+
+Where a `name-list` is a `length`, `char[]` pair.
+
+::: {.r-stack}
+:::{.small-table}
+| Field Name                     | Type        | Description                           |
+| ------------------------------ | ----------- | ------------------------------------- |
+| **SSH_MSG_KEXINIT**            | `byte`      | Message code = **20**                 |
+| **cookie**                     | `byte[16]`  | 16 random bytes                       |
+| **kex_algorithms**             | `name-list` | Key exchange algorithms               |
+| **server_host_key_algorithms** | `name-list` | Allowed server host key algorithms    |
+| **encryption_algorithms_?**    | `name-list` | C→S, S→C encryption algorithms        |
+| **mac_algorithms_?**           | `name-list` | C→S, S→C MAC algorithms               |
+| **compression_algorithms_?**   | `name-list` | C→S, S→C compression algorithms       |
+| **languages_?**                | `name-list` | C→S, S→C language preferences         |
+| **first_kex_packet_follows**   | `boolean`   | Is next packet is optimistically sent |
+| **reserved**                   | `uint32`    | Must be **0**                         |
+:::
+:::
+
+## SSH - Init Flow
+
+A brief overlook of the rest of the process:
+
+1. Version Exchange
+2. Key Exchange
+3. User Authentication
+4. Channel Management
+5. Transfer data!
 
 ## SSH - User Authentication
 
@@ -1082,6 +1158,10 @@ Lastly, we can finally send actual data over a connection, whether it be our ses
 | **Message**           | `byte`   | `94` (SSH_MSG_CHANNEL_DATA) |
 | **Recieving Channel** | `uint32` | `0x0000 0000`               |
 | **Data**              | `string` |                             |
+
+## SSH
+
+Thats all!
 
 # Web APIs
 
