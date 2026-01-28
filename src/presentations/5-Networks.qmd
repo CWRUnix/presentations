@@ -1510,13 +1510,11 @@ Border Gateway Protocol is a way for nodes to communicate the fastest routes to 
 - Uses TCP on port 179
 - Not very secure and is prone to poisoning
 
-## IGMP
+<!-- ## IGMP
 
 ## WebRTC
 
 ## gRPC/tRPC
-
-
 
 ## IRC/XMPP
 
@@ -1535,13 +1533,6 @@ Border Gateway Protocol is a way for nodes to communicate the fastest routes to 
 ## MGCP/VoIP
 
 ## Git
-
-
-
-
-
-
-
 
 ## RDP
 
@@ -1580,4 +1571,4 @@ Border Gateway Protocol is a way for nodes to communicate the fastest routes to 
 - Virtual Ethernets
 - Reverse proxies
 
-TODO
+TODO -->
