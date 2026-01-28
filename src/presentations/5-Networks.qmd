@@ -1236,56 +1236,6 @@ eventSource.onmessage = function(event) {
 | **Error Handling** | Promise-based | Event-based |
 | **Use Case** | API calls, file uploads | Live updates, notifications |
 
-## How do they work?
-
-1. You: "hey, I want to connect to you and then talk over WebSocket. Here's a challenge to prove you are worthy"
-1. Server: "yep yep, let's do it! I completed your challenge."
-1. You: Okay, here's a FRAME for message #1
-1. Server: Okay great, here a FRAME for MY message #1
-1. You: Ok let's close for (reason). Opcode 8!
-1. Server: ~closes tcp~
-
-## Example!
-
-**How do we fragment?**
-(p.s. why do we fragment?)
-
-```
-WebSocket fragmented message (server → client)
-Message: "Hello, world"
-Split into: "Hello, " + "world"
-(totally arbitrary)
-
-───────────── Frame 1 ─────────────
-FIN=0 (more fragments follow)
-Opcode=0x1 (text frame)
-Mask=0 (server → client unmasked)
-Payload="Hello, " (7 bytes)
-───────────────────────────────────
-0x01 0x07 48 65 6c 6c 6f 2c 20
-
-Breakdown:
-0x01  → 0000 0001  → FIN=0, OPCODE=1
-0x07  → 0000 0111  → MASK=0, LEN=7
-48 65 6c 6c 6f 2c 20  → "Hello, "
-
-───────────── Frame 2 ─────────────
-FIN=1 (final frame)
-Opcode=0x0 (continuation)
-Mask=0
-Payload="world" (5 bytes)
-───────────────────────────────────
-0x80 0x05 77 6f 72 6c 64
-
-Breakdown:
-0x80  → 1000 0000  → FIN=1, OPCODE=0
-0x05  → 0000 0101  → MASK=0, LEN=5
-77 6f 72 6c 64  → "world"
-
-───────────── Combined payload ─────────────
-"Hello, " + "world" = "Hello, world"
-```
-
 ## Client -> server:
 
 ```
@@ -1409,6 +1359,47 @@ Sec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover
 
 (Ignores x-super-mux (not supported))
 Adds its own parameter (server_no_context_takeover).
+
+## Example!
+
+**How do we fragment?**
+(p.s. why do we fragment?)
+
+```
+WebSocket fragmented message (server → client)
+Message: "Hello, world"
+Split into: "Hello, " + "world"
+(totally arbitrary)
+
+───────────── Frame 1 ─────────────
+FIN=0 (more fragments follow)
+Opcode=0x1 (text frame)
+Mask=0 (server → client unmasked)
+Payload="Hello, " (7 bytes)
+───────────────────────────────────
+0x01 0x07 48 65 6c 6c 6f 2c 20
+
+Breakdown:
+0x01  → 0000 0001  → FIN=0, OPCODE=1
+0x07  → 0000 0111  → MASK=0, LEN=7
+48 65 6c 6c 6f 2c 20  → "Hello, "
+
+───────────── Frame 2 ─────────────
+FIN=1 (final frame)
+Opcode=0x0 (continuation)
+Mask=0
+Payload="world" (5 bytes)
+───────────────────────────────────
+0x80 0x05 77 6f 72 6c 64
+
+Breakdown:
+0x80  → 1000 0000  → FIN=1, OPCODE=0
+0x05  → 0000 0101  → MASK=0, LEN=5
+77 6f 72 6c 64  → "world"
+
+───────────── Combined payload ─────────────
+"Hello, " + "world" = "Hello, world"
+```
 
 ## Frames
 
