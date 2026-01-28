@@ -1,0 +1,1574 @@
+---
+title: "Networks"
+author: "Presented by Trevor and Wolf"
+---
+
+# 1: Introduction
+
+## What is Networking?
+
+Networking is the way that multiple computer systems connect and exchange data.
+
+This is performed through a 7-layer abstraction stack called the Open Systems Interconnection model.
+
+## The Abstraction Stack
+
+The Open Systems Interconnection Model - not a formal requirement for networking
+
+|        Layer | Purpose                            |
+| -----------: | ---------------------------------- |
+|  Application | Provides networking to apps        |
+| Presentation | Converts or encrypts data          |
+|      Session | Manages stateful connections       |
+|    Transport | Sends and Tracks packets           |
+|      Network | Routing of packets across networks |
+|    Data Link | Communication between two devices  |
+|     Physical | Physical infrastructure            |
+
+## Protocols
+
+A protocol is an implementation of one layer in the stack, it also includes how data is layed out in that layer.
+
+- HTTP, FTP, SMTP, SSH
+- SSL/TLS
+- RPC
+- TCP, UDP
+- IP, ICMP
+- Ethernet, PPP
+- IEEE 802.* (WiFi/Ethernet)
+
+## Protocol Suite
+
+Protocol Suites are sets of protocols that span multiple layers of the stack.
+
+For example, HTTPS(TCP/IP) utilizes SSL/TLS, TCP, and IP.
+
+```{mermaid}
+graph TB
+    subgraph OSI["OSI Model"]
+        L7["Layer 7<br>Application"]
+        L6["Layer 6<br>Presentation"]
+        L4["Layer 4<br>Transport"]
+        L3["Layer 3<br>Network"]
+        L2["Layer 2<br>Data Link"]
+        L1["Layer 1<br>Physical"]
+    end
+
+    subgraph HTTPS
+      HTTP
+      TLS
+      TCP
+      IP
+    end
+
+    L7 --> HTTP
+    L6 --> TLS
+    L4 --> TCP
+    L3 --> IP
+```
+
+# 2: OSI Layers
+
+## Application
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+| ***--- App ---*** |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Any application that requires networking will be on this layer including meta-protocols.
+
+:::{}
+:::{.columns}
+:::{.column width="50%"}
+- DHCP
+- BGP
+- HTTP
+- NTP
+- LDAP
+- RDP
+:::
+:::{.column width="50%"}
+- SSH
+- SMTP
+- IMAP/POP
+- (S)FTP
+- BitTorrent
+- WebRTC
+:::
+:::
+:::
+
+:::
+:::
+
+## Presentation
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+| ***--- Pres. ---*** |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages converting data that is sent into data that is usable for applications.
+
+Handles:
+
+- Translation
+- Encryption
+- Compression
+- Serialization
+
+This includes character encoding, SSL, and MIME.
+:::
+:::
+
+## Session
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+| ***--- Sess. ---*** |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages keeping sessions open on devices. This ensures that ports remain open when you have an active connection. Not many protocols utilize this much anymore.
+
+- RPC (Remote Procedure Call)
+- SAP (Session Announcement)
+- SIP (Session Initiation)
+- Sometimes TCP/SSL
+
+:::
+:::
+
+## Transport
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages exactly how packets are reliably sent to and from the target. Typically, only TCP (Transmossion Control) or UDP (User Datagram) are used.
+
+Has to manage:
+
+- Segmentation
+- Flow Control
+- Error / Loss
+- Multiplexing
+:::
+:::
+
+## Network
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Manages how information is addressed and sent to the correct destination, down the fastest available route
+
+This includes:
+
+- IP (Internet Protocol)
+- PIM/IP (Protocol Indepedent Multicast)
+- ICMP (Internet Control Management)
+- IGMP (Internet Group Management)
+- IPsec (IP Security)
+
+:::
+:::
+
+## Data Link
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+The language that physical devices speak to each other. This is typically highly linked to the physical layer.
+
+- Ethernet is typically spoken over multiple strands of copper
+- WiFi is typically used when using radio
+- PPP (Point to Point Protocol) was used for things like Dial-Up
+:::
+:::
+
+## Physical
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+|  Data.  |
+| ***--- Phys. ---*** |
+| |
+:::
+:::{.column width="75%"}
+The physical medium that physically transports data between two devices.
+
+:::{}
+:::{.columns}
+:::{.column width="50%"}
+Could be:
+
+- Copper wires
+- Fiber optic
+- Radio
+- Lasers
+- Birds
+:::
+:::{.column width="50%"}
+![](5/Underwater.jpg)
+:::
+:::
+:::
+
+:::
+:::
+
+# 3: Implementations of Specific Protocols
+
+## Ethernet
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+| ***--- Phys. ---*** |
+| |
+:::
+:::{.column width="75%"}
+Typically represented with the symbol `<···>`
+
+Sends electrical pulses down twisted pairs.
+
+Uses line encoding like `Manchester`, `8b/10b`, or `PAM-5` for gigabit.
+
+
+:::
+:::
+
+## Ethernet
+
+:::{.columns}
+:::{.column width="50%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+|  Netw.  |
+| ***--- Data. ---*** |
+| ***--- Phys. ---*** |
+| |
+:::
+:::{.column width="50%"}
+![](./5/imgs/ethernet.svg)
+:::
+:::
+
+## IP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+The IP is a way to tell devices where to send information. It encapsulates pieces of information as packets, or a small piece of data with metadata.
+
+In the packet, it includes:
+
+- Version, Length
+- Identification, Flags, Fragment number
+- TTL, Protocol, Checksum
+- Source, Destination
+- The data being sent
+
+:::
+:::
+
+## Multicasting / Unicasting
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+Multicasting allows you to send a packet to multiple recipients without the overhead of needing to send it multiple times to multiple people.
+
+Utilizes IGMP to subscribe to groups and PIM to send messages to groups.
+
+:::
+:::
+## NAT
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| Transp. |
+| ***--- Netw. ---*** |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+NAT isn't really totally new but it totally dominates everything now since we don't have enough IPs for every computer, TV, and microwave in the world.
+
+It translates the IP header in order to make sure that packets get routed properly across subnets.
+:::
+:::
+
+
+## TCP/UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+A brief comparison between TCP and UDP.
+
+| Feature     | TCP                           | UDP                    |
+| ----------- | ----------------------------- | ---------------------- |
+| Connection  | 3-way handshake + termination | Connectionless         |
+| Reliability | Reliable                      | Unreliable             |
+| Ordering    | Guaranteed                    | Not guaranteed         |
+| Speed       | Slower (more overhead)        | Faster (less overhead) |
+
+:::
+:::
+
+## TCP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+Transmission Control Protocol is a way to send information and ensure reliability. Typically is slower than UDP due to the higher overhead.
+
+It ensures:
+
+- Packets are recieved
+- Packets are in order
+- Sessions and discussions are opened and closed
+:::
+:::
+
+## TCP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+![](./5/imgs/TCP.svg)
+:::
+:::
+
+## UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+
+User Datagram Protocol is the way to quickly send information from one place to another without ensuring that the recipient has recieved it or not.
+:::
+:::
+
+## UDP
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+|  Pres.  |
+|  Sess.  |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+![](./5/imgs/UDP.svg)
+:::
+:::
+
+## QUIC
+
+:::{.columns}
+:::{.column width="25%"}
+| |
+| :-----: |
+| |
+|   App   |
+| ***--- Pres. ---***  |
+| ***--- Sess. ---*** |
+| ***--- Transp. ---*** |
+|  Netw.  |
+|  Data.  |
+|  Phys.  |
+| |
+:::
+:::{.column width="75%"}
+A new protocol built on top of UDP that manages encryption, transport, and resilience.
+
+It essentially does TLS like packet routing, but specifically for HTTP and over UDP.
+
+This allows QUIC to be quick, yet still make sure things get to where it needs to be.
+:::
+:::
+
+# 3.1: Application Protocols
+
+## HTTP
+
+HyperText Transfer Protocol text based protocol for exchanging Hypertext information, more commonly known as websites.
+
+Structured as a status, options, and body all in pure text.
+
+## HTTP
+
+::: {.columns}
+::: {.column}
+Request Header
+
+:::{.small-table}
+|         |                      |                    |
+| ------- | -------------------- | ------------------ |
+| Status  | `POST / HTTP/1.1`    |                    |
+| Options | `Host:`              | `example.com`      |
+|         | `User-Agent:`        | `curl/8.6.0`       |
+|         | `Content-Type:`      | `application/json` |
+|         | `Content-Length:`    | `345`              |
+| Body    | `{"data": "ABC123"}` |                    |
+:::
+:::
+::: {.column}
+Response Header
+
+:::{.small-table}
+|         |                          |                                 |
+| ------- | ------------------------ | ------------------------------- |
+| Status  | `HTTP/1.1 403 Forbidden` |                                 |
+| Options | `Server:`                | `Apache`                        |
+|         | `Date:`                  | `Sat, 11 Oct 2025 16:21:30 EST` |
+|         | `Content-Type:`          | `text/html`                     |
+|         | `Content-Length:`        | `582`                           |
+|         | `Cache-Control:`         | `no-store`                      |
+| Body    | `<!DOCTYPE html>...`     |                                 |
+:::
+:::
+:::
+
+## HTTP
+
+There are plenty more options that can be put in the headers, including:
+
+- CORS headers
+- Cookies
+- Referrers
+- Protocol Upgrade
+- X-Forwarded information
+
+## HTTP
+
+Simple HTTP request
+
+```bash
+printf 'GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n' \
+  | nc -v example.com 80
+```
+
+## HTTP
+
+Simle HTTP server!
+
+```go
+package main
+
+import (
+  "net/http"
+
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+  
+  r.GET("/ping", func(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{
+      "message": "pong",
+    })
+  })
+  
+  r.Run()
+}
+```
+
+## DNS
+
+The Domain Name System is a protocol for resolving domain names into IP addresses. Since the internet itself doesn't directly route traffic to domains, yet people prefer domains due to their ease of memorization.
+
+- Operated by having centralized servers holding domain info
+- Multiple types of data can be associated with domains
+- Typically used to map domains to IPs
+- Typically operates over UDP, however can operate over TCP, or even HTTP(s)
+
+## DNS - Packet
+
+::: {.r-stack}
+![](./5/imgs/DNS.svg)
+:::
+
+## DNS - Flags
+
+::: {.r-stack}
+![](./5/imgs/DNS_flags.svg){width="700"}
+:::
+
+:::{.center}
+:::{.small-table}
+| Flag              | Meaning                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| **Q/R**           | Question (0) or Response (1)                                                             |
+| **Opcode**        | Standard (0), Inverse (1), Status (2)                                                    |
+| **AA**            | Is Authoritative Answer                                                                  |
+| **TC**            | Truncated by UDP or not                                                                  |
+| **RD**            | (Question) Recusion Desired                                                              |
+| **RA**            | (Answer) Recursion Available                                                             |
+| **Z**             | Reserved, always 0                                                                       |
+| **AD**            | DNSSec (Authenticated Data)                                                              |
+| **CD**            | DNSSec (Checking Disabled)                                                               |
+| **Response Code** | No Error (0), Format (1), Failure (2), Domain Name (3), Not Implemented (4), Refused (5) |
+:::
+:::
+
+## DNS - Question (???)
+
+| Portion of Question | Size     | Meaning                            |
+| ------------------- | -------- | ---------------------------------- |
+| **QNAME**           | Variable | Domain name (`www.example.com`)    |
+| **QTYPE**           | 2 bytes  | Type of query (`A`, `AAAA`, other) |
+| **QCLASS**          | 2 bytes  | Class of query (`IN`, `CH`, `ANY`) |
+
+## DNS - Question Name
+
+Represents the domain you are querying. This portion of the packet is variable length due to domain names being of arbitrary length.
+
+Formatted as groups of labels, followed by a null byte:
+
+`www.example.com` has 3 labels: `www`, `example`, `com`
+
+Each label is formatted as the length, in UTF-8, followed by the data:
+
+`www` -> `03 77.77.77`
+
+After all labels, there exists a null byte:
+
+`03 77.77.77 07 65.78.61.6d.70.6c.65 03 63.6f.6d 00`
+
+## DNS - Name Compression
+
+After the first instance of any label (or name), a compression name may be used instead.
+
+Instead of starting the label with the number of bytes for the first label, instead use the `c0` followed by the byte offset since the beginning of the packet to refer to another label.
+
+## DNS - Question Types
+
+The question types represent the possible questions you may ask a DNS server, for example to get the IP of a domain.
+
+:::{.small-table}
+| Type      | ID  | Name           | Purpose / What it Returns                                   | Common Use Case                                |
+| --------- | --- | -------------- | ----------------------------------------------------------- | ---------------------------------------------- |
+| **A**     | 1   | Address        | IPv4 address (e.g. `93.184.216.34`)                         | Standard hostname → IPv4 lookup                |
+| **AAAA**  | 28  | IPv6 Address   | IPv6 address (e.g. `2606:2800:220:1:248:1893:25c8:1946`)    | Hostname → IPv6 lookup                         |
+| **CNAME** | 5   | Canonical Name | Alias pointing to another hostname                          | Domain redirection / aliases (e.g. www → root) |
+| **TXT**   | 16  | Text           | Arbitrary text strings (SPF, DKIM, site verification, etc.) | Email authentication, domain verification      |
+| **MX**    | 15  | Mail Exchange  | Mail server hostname + priority                             | Email routing                                  |
+| **NS**    | 2   | Name Server    | Authoritative nameservers for a zone                        | Delegation and zone management                 |
+| **PTR**   | 12  | Pointer        | Reverse DNS (IP → hostname)                                 | Reverse lookups, rDNS checks                   |
+:::
+
+## DNS - Class Types
+
+This represents the class of information you are looking for.
+
+| Class   | ID  | Meaning    |
+| ------- | --- | ---------- |
+| **IN**  | 1   | Internet   |
+| **CS**  | 2   | CSNET      |
+| **CH**  | 3   | CHAOS      |
+| **HS**  | 4   | Hesiod     |
+| **ANY** | 255 | Everything |
+
+Majority of the time, you will be looking for `IN`, however some DNS servers may respond with additional debug information with the `CH` class.
+
+## DNS - Answer
+
+All DNS answers (Answer/Authority/Other) are formatted as RRs (Resource Records).
+
+| Field        | Size     | Description                           |
+| ------------ | -------- | ------------------------------------- |
+| **NAME**     | variable | Domain name or compression pointer    |
+| **TYPE**     | 2        | Record type (`A`, `AAAA`, `MX`, etc.) |
+| **CLASS**    | 2        | Class (`IN`, `CH`)                    |
+| **TTL**      | 4        | Time to live (seconds)                |
+| **RDLENGTH** | 2        | Length of RDATA field (bytes)         |
+| **RDATA**    | variable | Record data (depends on `TYPE`)       |
+
+## DNS - Practice!
+
+Lets query the IP for `www.example.com`!
+
+:::{.small-table .r-stack}
+| Portion              | Value                                                    |
+| -------------------- | -------------------------------------------------------- |
+| **TxID**             | `0x1234`                                                 |
+| **Flags**            | `0x0100` (`0000 0001 0000 0000`) Request Recursion       |
+| **# Questions**      | `0x0001`                                                 |
+| **# Answers**        | `0x0000`                                                 |
+| **# Authoritative**  | `0x0000`                                                 |
+| **# Other**          | `0x0000`                                                 |
+| **Question - Name**  | `0x03777777076578616d706c6503636f6d00` (www.example.com) |
+| **Question - Type**  | `0x0001` (`A` Query)                                     |
+| **Question - Class** | `0x0001` (`IN` Class)                                    |
+:::
+
+```bash
+QUERY="1234 0100 0001 0000 0000 0000 03777777076578616d706c6503636f6d00 0001 0001"
+echo "$QUERY" | xxd -r -p | nc -u -w1 8.8.8.8 53 | xxd
+```
+
+## DNS - Decode
+
+```plaintext
+      Header
+
+1234 8180
+0001 0004
+0000 0000
+
+      Questions (1)
+
+      www.example.com
+      A/IN
+
+03 777777 07 6578616d706c65 03 636f6d 00
+0001 0001
+
+      Answers (4)
+
+      www.example.com
+      NS/IN
+      41s TTL
+      22 bytes
+      www.example.com-v4.edgesuite.net
+
+c0 0c
+0005 0001
+00000041
+0022
+03 777777 07 6578616d706c65 06 636f6d2d7634 09 656467657375697465 03 6e6574 00
+
+      www.example.com-v4.edgesuite.net
+      NS/IN
+      16053s TTL
+      14 bytes
+      a1422.dscr.akamai.net
+
+c0 2d
+0005 0001
+00003eb5
+0014
+05 6131343232 04 64736372 06 616b616d6169 c0 4a
+
+      www.example.com
+      A/IN
+      14s TTL
+      23.205.89.16
+
+c0 5b
+0001 0001
+00000014
+0004
+17 cd 59 10
+
+      www.example.com
+      A/IN
+      14s TTL
+      23.205.89.33
+
+c0 5b
+0001 0001
+00000014
+0004
+17 cd 59 21
+```
+
+## DNS - Decode
+
+We see that the returned data includes:
+
+- Nameservers
+  - www.example.com-v4.edgesuite.net
+  - a1422.dscr.akamai.net (`c0 4a` points to `.net`)
+- IP addresses
+  - `23.205.89.16`
+  - `23.205.89.33`
+
+## DNS Authoritative vs Recusive Resolvers
+
+Authoritative DNS servers hold the original master copy of a DNS record. This is the server that the `NS` record resolves to!
+
+Recursive (or caching) DNS servers are typically closer to the place you are querying from, allowing for faster response speeds and lower load. When these servers do no have the DNS record in query, it will recursively query its own DNS server until a response is returned.
+
+## DNS Authoritative vs Recusive Resolvers
+
+::: {.r-stack}
+![](./5/imgs/DNS_recursive.svg){width="700"}
+:::
+
+## DNS Poisoning
+
+Since DNS operates over UDP and does NOT do any kinda of cryptographic verification or validation, DNS is succeptible to poisoning attacks.
+
+- This is when you send a UDP packet to a DNS server claiming you contain an update to a DNS record, while you fill in the record with whatever information you want
+- This means the DNS server will cache an incorrect record and relay this information to whoever else queries this server.
+
+## DNS Poisoning
+
+::: {.r-stack}
+![](./5/imgs/DNS_poison.svg){width="700"}
+:::
+
+## DNS
+
+Various DNS queries
+
+```bash
+# Why do we use "sudo bash -c" ??
+sudo bash -c '
+  tshark -i any -a duration:2 -f "tcp port 53 and host 1.1.1.1" -V -O dns  &
+  sleep 0.2
+  dig @1.1.1.1 example.com A +tcp +norecurse >/dev/null
+  wait
+  cat /tmp/dns.txt
+'
+```
+
+```bash
+monolith https://website.web -o website.html
+```
+
+## DNS
+
+Local DNS resolver
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOMAIN=case.eduu
+
+sudo systemctl stop systemd-resolved
+cleanup() {
+  pkill -P $$ dnsmasq || true
+  sudo systemctl start systemd-resolved
+}
+trap cleanup EXIT INT TERM
+
+sleep 1
+sudo dnsmasq --no-daemon \
+  --listen-address=127.0.0.53 \
+  --address=/$DOMAIN/127.0.0.1 &
+sleep 1
+
+sudo python3 - <<'PY'
+import http.server, socketserver
+class H(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        with open('./website.html', 'rb') as f:
+            body = f.read()
+        self.send_response(200)
+        self.send_header('Content-Type','text/html')
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+    def log_message(self, *args): pass
+socketserver.TCPServer(('', 80), H).serve_forever()
+PY
+```
+
+# SSH!
+
+---
+
+## SSH
+
+SSH is used for remote access to other computers, additionally allowing the transfer of files, port fowarding, and multiplexing.
+
+The `SSH` overarching concept is split into 3 separate protocols:
+
+- Transport Layer Protocol (`SSH-TRANS`)
+- User Authentication Protocol (`SSH-USERAUTH`)
+- Connection Protocol (`SSH-CONN`)
+
+SSH typically operates over TCP over port 22.
+
+## SSH - Transport Layer
+
+The SSH transport layer is responsible for managing and encrypting the session between the client and the server.
+
+- All other parts of SSH run on top of this layer
+- Diffie-Hellman Key Exchange (DH-KEX) happens before authentication
+- Once a symmetric key is obtained, all communications are fully encrypted with this key
+
+## SSH - Transport Layer
+
+When establishing a connection, a shared secret will be derived from your nonce and random primes, which power the Diffie Hellman key exchange algorithm. This symmetric key will be used to encrypt all SSH packets from now on.
+
+Possible Symmetric key encryption algorithms SSH can use:
+
+- AES
+- Blowfish
+- 3DES
+- CAST128
+- Arcfour
+
+## SSH - User Authentication
+
+This portion of SSH is to validate that the client is a permitted user of the system, this follows your SSH config and verifies your identity with one of:
+
+- Password (bad)
+- SSH Public/Private key (good)
+- PAM (good)
+- CWRUnix PAM (very very good!)
+
+Note that if using a keypair here, it is never used for the encryption of the session, it only exists for the authentication of the user.
+
+## SSH - Connection
+
+Once a user is authenticated, then any amount of connections may be opened across the transport. SSH supports many kinds of connections, including:
+
+- Session (terminal)
+- X11 forwarding
+- SCP/SFTP
+- Tunneling
+- Custom Subsystems (for nonstandard traffic)
+
+## SSH - Packet Flow
+
+When establishing a connection, the first thing that is sent is your version string, which must be of the following form:
+
+`SSH-{proto-version}-{software-name-and-version}\r\n`
+
+This is send unencrypted and as raw ASCII over a TCP packet.
+
+After version numebers are exchanged, everything else will be sent over the transport layer packet protocol.
+
+## SSH - Transport Packet
+
+Packet Length: Size of encrypted packet
+
+MAC: Signature of encrypted packet (when packets are encrypted)
+
+Padding: Necessary to not leak info and normalize packet size
+
+::: {.r-stack}
+![](./5/imgs/SSH_transport.svg){width="700"}
+:::
+
+## SSH - Key Exchange Packets
+
+There are a few kinds of key exchange packets that need to be sent before full encryption is established:
+
+These packets are NOT encrypted when sent, but it does not weaken the connection.
+
+::: {.r-stack}
+:::{.small-table}
+| Type                      | Numeric | Direction | Description                     |
+| ------------------------- | ------- | --------- | ------------------------------- |
+| **SSH_MSG_KEXINIT**       | 20      | Both      | Exchange possible key exchanges |
+| **SSH_MSG_KEXDH_INIT**    | 30      | C→S       | DH init packet                  |
+| **SSH_MSG_KEX_ECDH_INIT** | 30      | C→S       | DH-EC init packet               |
+| **SSH_MSG_KEXDH_REPLY**   | 31      | S→C       | DH Reply packet                 |
+| **SSH_MSG_ECDH_REPLY**    | 31      | S→C       | DH Reply packet                 |
+| **SSH_MSG_NEWKEYS**       | 21      | Both      | Begin using encryption!         |
+:::
+:::
+
+## SSH - KEXINIT example
+
+Where a `name-list` is a `length`, `char[]` pair.
+
+::: {.r-stack}
+:::{.small-table}
+| Field Name                     | Type        | Description                           |
+| ------------------------------ | ----------- | ------------------------------------- |
+| **SSH_MSG_KEXINIT**            | `byte`      | Message code = **20**                 |
+| **cookie**                     | `byte[16]`  | 16 random bytes                       |
+| **kex_algorithms**             | `name-list` | Key exchange algorithms               |
+| **server_host_key_algorithms** | `name-list` | Allowed server host key algorithms    |
+| **encryption_algorithms_?**    | `name-list` | C→S, S→C encryption algorithms        |
+| **mac_algorithms_?**           | `name-list` | C→S, S→C MAC algorithms               |
+| **compression_algorithms_?**   | `name-list` | C→S, S→C compression algorithms       |
+| **languages_?**                | `name-list` | C→S, S→C language preferences         |
+| **first_kex_packet_follows**   | `boolean`   | Is next packet is optimistically sent |
+| **reserved**                   | `uint32`    | Must be **0**                         |
+:::
+:::
+
+## SSH - Init Flow
+
+A brief overlook of the rest of the process:
+
+1. Version Exchange
+2. Key Exchange
+3. User Authentication
+4. Channel Management
+5. Transfer data!
+
+## SSH - User Authentication
+
+These are the supported messages for User Authentication, each messsage has its own packet structure
+
+::: {.r-stack}
+:::{.small-table}
+| Type                         | Numeric | Direction | Description                    |
+| ---------------------------- | ------- | --------- | ------------------------------ |
+| **SSH_MSG_USERAUTH_REQUEST** | 50      | C→S       | Client requests authentication |
+| **SSH_MSG_USERAUTH_FAILURE** | 51      | S→C       | Server denies authentication   |
+| **SSH_MSG_USERAUTH_SUCCESS** | 52      | S→C       | Server accepts authentication  |
+| **SSH_MSG_USERAUTH_BANNER**  | 53      | S→C       | Optional banner message        |
+:::
+:::
+
+## SSH - User Authentication Example
+
+Here is an example of starting the authentication with username "alice" with password "hunter2"
+
+Sample `SSH_MSG_USERAUTH_REQUEST` payload:
+
+::: {.r-stack}
+:::{.small-table}
+| Portion        | Type                            | Value                                        |
+| -------------- | ------------------------------- | -------------------------------------------- |
+| **Message**    | `byte`                          | `50` (SSH_MSG_USERAUTH_REQUEST)              |
+| **Username**   | `length (uint32), char[length]` | `00 00 00 05 61 6c 69 63 65` (alice)         |
+| **Service**    | `length (uint32), char[length]` | "ssh-connection"                             |
+| **Method**     | `length (uint32), char[length]` | "password"                                   |
+| **Change PW**  | `boolean (byte)`                | `0x00`                                       |
+| **Auth Value** | `length (uint32), char[length]` | `00 00 00 07 68 75 6e 74 65 72 32` (hunter2) |
+:::
+:::
+
+This value would then be sent as the payload of the transport packet.
+
+## SSH - Connection
+
+These are the valid messages for managing channels. Note that you are only allowed to manage channels after authentication is complete.
+
+:::{.r-stack}
+:::{.small-table}
+| Type                                  | Numeric |
+| ------------------------------------- | ------- |
+| **SSH_MSG_CHANNEL_OPEN**              | 90      |
+| **SSH_MSG_CHANNEL_OPEN_CONFIRMATION** | 91      |
+| **SSH_MSG_CHANNEL_OPEN_FAILURE**      | 92      |
+| **SSH_MSG_CHANNEL_WINDOW_ADJUST**     | 93      |
+| **SSH_MSG_CHANNEL_DATA**              | 94      |
+| **SSH_MSG_CHANNEL_EXTENDED_DATA**     | 95      |
+| **SSH_MSG_CHANNEL_EOF**               | 96      |
+| **SSH_MSG_CHANNEL_CLOSE**             | 97      |
+| **SSH_MSG_CHANNEL_REQUEST**           | 98      |
+| **SSH_MSG_CHANNEL_SUCCESS**           | 99      |
+| **SSH_MSG_CHANNEL_FAILURE**           | 100     |
+:::
+:::
+
+## SSH - Connection Example
+
+This is how we would begin a text session after authenticating on channel number `0`, since SSH allows multiplexing:
+
+::: {.r-stack}
+:::{.small-table}
+| Portion             | Type                            | Value                       |
+| ------------------- | ------------------------------- | --------------------------- |
+| **Message**         | `byte`                          | `90` (SSH_MSG_CHANNEL_OPEN) |
+| **Channel Type**    | `length (uint32), char[length]` | "session"                   |
+| **Sender Channel**  | `uint32`                        | `0x0000 0000`               |
+| **Window Size**     | `uint32`                        | `0x0020 0000` (2MiB)        |
+| **Max Packet Size** | `uint32`                        | `0x0000 8000`               |
+:::
+:::
+
+## SSH - Data Transfer Example
+
+Lastly, we can finally send actual data over a connection, whether it be our session, files, or forwarding a port.
+
+| Portion               | Type     | Value                       |
+| --------------------- | -------- | --------------------------- |
+| **Message**           | `byte`   | `94` (SSH_MSG_CHANNEL_DATA) |
+| **Recieving Channel** | `uint32` | `0x0000 0000`               |
+| **Data**              | `string` |                             |
+
+## SSH
+
+Thats all!
+
+# Web APIs
+
+What is a WebAPI?
+
+https://developer.mozilla.org/en-US/docs/Web/API
+
+![Web Vibration API](https://static.404wolf.com/web-vibration.png)
+
+The syscalls of the internet!
+
+## Fetching Weather Data
+
+```javascript
+fetch('https://wttr.in/Cleveland?format=j1')
+  .then(response => response.json())
+  .then(data => {
+    const current = data.current_condition[0];
+    console.log(`Temperature: ${current.temp_C}°C`);
+    console.log(`Weather: ${current.weatherDesc[0].value}`);
+  })
+  .catch(error => console.error('Error:', error));
+```
+
+## Recall HTTP
+
+```http
+GET /api/users/123 HTTP/1.1\r\n
+Host: example.com\r\n
+Accept: application/json\r\n
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\r\n
+User-Agent: Mozilla/5.0\r\n
+\r\n
+HTTP/1.1 200 OK\r\n
+Content-Type: application/json\r\n
+Content-Length: 85\r\n
+\r\n
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+# SSE
+
+Server sent events!!
+
+https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+
+## What are they?
+
+An easy way to be fed EVENTs from a server
+
+```js
+const eventSource = new EventSource('https://api.example.com/events');
+
+eventSource.onmessage = function(event) {
+  console.log('Received:', event.data);
+};
+```
+
+## Fetch vs SSE Comparison
+
+| Feature | Fetch API | Server-Sent Events (SSE) |
+|---------|-----------|--------------------------|
+| **Direction** | Request-Response | Server → Client only |
+| **Connection** | One-time | Persistent |
+| **Real-time** | No | Yes |
+| **Data Format** | Any (JSON, text, etc.) | Text-based events |
+| **Overhead** | New connection per request | Single connection |
+| **Error Handling** | Promise-based | Event-based |
+| **Use Case** | API calls, file uploads | Live updates, notifications |
+
+## Client -> server:
+
+```
+GET /sse HTTP/1.1\r\n
+Host: example.com\r\n
+Accept: text/event-stream\r\n
+Cache-Control: no-cache\r\n
+Connection: keep-alive\r\n
+Last-Event-ID: 42\r\n
+\r\n\r\n
+```
+
+> Last-Event-ID → (optional) client asking to resume after a dropped connection.
+
+Hey there! I wanna connect to your SSE PLLS
+
+## Server -> client:
+
+```
+HTTP/1.1 200 OK\r\n
+Content-Type: text/event-stream\r\n
+Cache-Control: no-cache\r\n
+Connection: keep-alive\r\n
+\r\n\r\n
+```
+
+Ready, set, go!
+
+## Example
+
+```
+retry: 5000
+event: welcome
+data: Hello, client!
+id: 1
+
+event: tick
+id: 2
+data: 2025-10-25T16:53:00Z
+
+data: still alive
+```
+
+(note that last line!)
+We don't need an `id`, but we lose deduplication and auto-resume :(
+
+# WebSockets
+
+RFC nitty gritty!
+
+## I want to talk!
+
+**WebSocket Handshake** (RFC 6455 §1.3)
+
+The WebSocket protocol begins as an **HTTP/1.1 upgrade request**,  
+allowing clients and servers to switch from HTTP to a persistent TCP-based, full-duplex WebSocket connection.
+
+The goal:
+
+Change from HTTP to HTTP but we use the TCP socket underneath!
+
+## Request!
+
+```
+GET /ws-path HTTP/1.1\r\n
+Host: example.com\r\n
+Upgrade: websocket\r\n
+Connection: Upgrade\r\n
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n
+Sec-WebSocket-Version: 13\r\n
+\r\n\r\n
+```
+
+## Request details
+
+- `Upgrade: websocket` — asks to switch protocol
+- `Connection: Upgrade` — signals intent to upgrade (part of the HTTP specification, which WebSocket uses)
+- `Sec-WebSocket-Key` — random 16-byte base64 value (for challenge–response)
+- `Sec-WebSocket-Version` — must be `13` (current RFC) (just the version)
+- `Origin` — browser security policy
+
+## Response details
+
+- Status `101` = successful protocol switch  
+- `Sec-WebSocket-Accept` = `base64(SHA1(key + GUID))`
+  - GUID = `258EAFA5-E914-47DA-95CA-C5AB0DC85B11`
+- Echoes accepted extensions (if any)
+
+## Extension Negotiation (RFC 6455 §9)
+
+> WebSocket extensions allow endpoints to modify how frames are interpreted  
+> (e.g., compression, multiplexing) without breaking protocol compatibility.
+> ---
+
+> During the **opening handshake**, the client proposes extensions via the  
+> `Sec-WebSocket-Extensions` header:
+
+## Let's see it
+
+```
+GET /chat HTTP/1.1
+Host: example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Version: 13
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits, x-super-mux
+```
+
+## How do we choose?
+
+The server chooses!
+
+Which extensions it’s willing to use, and the exact parameters for each one.
+
+```
+Sec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover
+```
+
+(in the upgrade response)
+
+(Ignores x-super-mux (not supported))
+Adds its own parameter (server_no_context_takeover).
+
+## Example!
+
+**How do we fragment?**
+(p.s. why do we fragment?)
+
+```
+WebSocket fragmented message (server → client)
+Message: "Hello, world"
+Split into: "Hello, " + "world"
+(totally arbitrary)
+
+───────────── Frame 1 ─────────────
+FIN=0 (more fragments follow)
+Opcode=0x1 (text frame)
+Mask=0 (server → client unmasked)
+Payload="Hello, " (7 bytes)
+───────────────────────────────────
+0x01 0x07 48 65 6c 6c 6f 2c 20
+
+Breakdown:
+0x01  → 0000 0001  → FIN=0, OPCODE=1
+0x07  → 0000 0111  → MASK=0, LEN=7
+48 65 6c 6c 6f 2c 20  → "Hello, "
+
+───────────── Frame 2 ─────────────
+FIN=1 (final frame)
+Opcode=0x0 (continuation)
+Mask=0
+Payload="world" (5 bytes)
+───────────────────────────────────
+0x80 0x05 77 6f 72 6c 64
+
+Breakdown:
+0x80  → 1000 0000  → FIN=1, OPCODE=0
+0x05  → 0000 0101  → MASK=0, LEN=5
+77 6f 72 6c 64  → "world"
+
+───────────── Combined payload ─────────────
+"Hello, " + "world" = "Hello, world"
+```
+
+## Frames
+
+```
+0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-------+-+-------------+-------------------------------+
+    |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+    |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+    |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+    | |1|2|3|       |K|             |                               |
+    +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+    |     Extended payload length continued, if payload len == 127  |
+    + - - - - - - - - - - - - - - - +-------------------------------+
+    |                               |Masking-key, if MASK set to 1  |
+    +-------------------------------+-------------------------------+
+    | Masking-key (continued)       |          Payload Data         |
+    +-------------------------------- - - - - - - - - - - - - - - - +
+    :                     Payload Data continued ...                :
+    + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+    |                     Payload Data continued ...                |
+    +---------------------------------------------------------------+
+```
+
+## RSV1
+
+Extension: permessage-deflate (RFC 7692)
+
+Use RSV1 to say "Yes i am compressed!!"
+
+https://datatracker.ietf.org/doc/html/rfc7692
+
+```
+ This document specifies a framework for adding compression
+ functionality to the WebSocket Protocol [RFC6455].  The framework
+ specifies how to define WebSocket Per-Message Compression Extensions
+ (PMCEs) for a compression algorithm based on the extension concept of
+ the WebSocket Protocol specified in Section 9 of [RFC6455].  A
+ WebSocket client and a peer WebSocket server negotiate the use of a
+ PMCE and determine the parameters required to configure the
+ compression algorithm during the WebSocket opening handshake.  The
+ client and server can then exchange data messages whose frames
+ contain compressed data in the payload data portion.
+```
+
+# Big Frames
+
+Let’s say you want to send a 10 MB binary file.
+You could theoretically make one huge frame -- but that’s not ideal for:
+
+- Memory allocation (you’d need a full buffer before sending)
+- Streaming or progressive transmission
+- Interleaving pings/pongs between fragments
+- So instead, you can split the message:
+
+## Frames continued
+
+RSV1, RSV2, RSV3:  1 bit each
+
+MUST be 0 unless an extension is negotiated that defines meanings
+for non-zero values.  If a nonzero value is received and none of
+the negotiated extensions defines the meaning of such a nonzero
+value, the receiving endpoint MUST _Fail the WebSocket
+Connection_.
+
+:::{.small-table .r-stack}
+| Frame | Opcode | FIN | Meaning | Identification |
+|-------|--------|-----|---------|----------------|
+| #1 | 0x2 (binary) | 0 | First fragment | Opcode != 0x0, FIN = 0 |
+| #2 | 0x0 (continuation) | 0 | Middle fragment | Opcode = 0x0, FIN = 0 |
+| #3 | 0x0 (continuation) | 1 | Final fragment | Opcode = 0x0, FIN = 1 |
+:::
+
+
+## Opcodes
+
+```
+Opcode:  4 bits
+
+    Defines the interpretation of the "Payload data".  If an unknown
+    opcode is received, the receiving endpoint MUST _Fail the
+    WebSocket Connection_.  The following values are defined.
+
+    *  %x0 denotes a continuation frame
+    *  %x1 denotes a text frame
+    *  %x2 denotes a binary frame
+    *  %x3-7 are reserved for further non-control frames
+    *  %x8 denotes a connection close
+    *  %x9 denotes a ping
+    *  %xA denotes a pong
+    *  %xB-F are reserved for further control frames
+```
+
+## What are pings??
+
+A ping is a heartbeat. What is a heartbeat?
+
+It's just "I'm still here, pls do not close my connection <3"
+
+
+## BGP
+
+Next week!
+
+Border Gateway Protocol is a way for nodes to communicate the fastest routes to route IP packets. The communication itself is on the application layer, even if it influences how devices route things on the Network level.
+
+- Works by advertising to nearby nodes distances/weights to specific IP addresses
+- Uses TCP on port 179
+- Not very secure and is prone to poisoning
+
+<!-- ## IGMP
+
+## WebRTC
+
+## gRPC/tRPC
+
+## IRC/XMPP
+
+## Wireguard/OpenVPN
+
+## WebTransport
+
+## FTP
+
+## Postgres/SQL
+
+## IMAP/POP
+
+## SSE/Matrix
+
+## MGCP/VoIP
+
+## Git
+
+## RDP
+
+## VNC
+
+## NTP
+
+## MCP
+
+## OSPF
+
+## BIRD
+
+## SIP
+
+## ARP/MAC
+
+## DHCP
+
+## IPP
+
+## LDAP
+
+## RADIUS
+
+## 802.11
+
+## RAFT
+
+## MQTT
+
+# 4: Linux Concepts of Networking
+
+- Virtual Devices
+- Sockets
+- Virtual Ethernets
+- Reverse proxies
+
+TODO -->

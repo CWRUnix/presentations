@@ -1,0 +1,27 @@
+color:
+  palette:
+    light: "#f5f3ef"
+    dark: "#1c1c1c"
+  background: dark
+  foreground: light
+  # primary: p
+  # secondary: s
+# logo:
+#   small: branding/logo-${COLOR}.svg
+#   medium: branding/logomark-uni-${COLOR}.svg
+#   large: branding/stacked-uni-${COLOR}.svg
+# typography:
+#   fonts:
+#     - family: DejaVu Sans
+#       source: file
+#       files:
+#         - path: fonts/DejaVuSansMono.ttf
+#         - path: fonts/DejaVuSansMono-Oblique.ttf
+#           style: italic
+#         - path: fonts/DejaVuSansMono-Bold.ttf
+#           weight: bold
+#         - path: fonts/DejaVuSansMono-BoldItalic.ttf
+#           style: italic
+#           weight: bold
+#   base: DejaVu Sans
+#   headings: DejaVu Sans

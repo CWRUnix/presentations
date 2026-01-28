@@ -7,7 +7,7 @@ mermaid:
   htmlLabels: false
 format:
   revealjs:
-    theme: night
+    # theme: night
     number-sections: false
     slide-number: c/t
     show-slide-number: all
@@ -20,3 +20,6 @@ format:
     css: styles.css
 # execute:
   # cache: true
+brand:
+  light: _brand.yml
+  dark: _brand.yml
