@@ -1,0 +1,620 @@
+%% 
+We should start out by just generally inspiring people. Tell them generally what nix is, what it can do, and why they should care.
+If we get too technical we will quickly scare people away!
+%%
+
+For our reference, an empty flake for using for demos in the talk:
+
+```
+{
+  description = "demo flake";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+  outputs = { self, nixpkgs }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
+    in
+    {
+      packages.${system}.default = pkgs.writeTextFile {
+        name = "hello.txt";
+        text = "Hello, world!\n";
+      };
+    };
+}
+```
+# What is Nix?
+
+## Nix is just another Programming language
+
+Just like Java or Python or Bash.
+
+```nix
+let
+  fizzbuzz = n:
+    if n % 15 == 0 then "FizzBuzz"
+    else if n % 3 == 0 then "Fizz"
+    else if n % 5 == 0 then "Buzz"
+    else builtins.toString n;
+in
+  builtins.genList (i: fizzbuzz (i + 1)) 10
+```
+
+It's not an "operating system" or "package manager." But it can do both of those things. More on that later.
+
+## Nix functions can return *anything*
+
+
+
+But unlike the languages you're used to, Nix doesn't just return 
+
+```nix
+{ pkgs, ... }:
+pkgs.writeTextFile {
+  name = "hello.txt";
+  text = "Hello, world!\n";
+}
+```
+
+It's not printing to the terminal. It's *return*ing a binary file!
+
+```
+╭─wolf at wolf-laptop in /tmp/tmp.RmsgK6BtQ0
+╰─○ cat result                   
+─────┬───────────
+     │ File: result
+─────┼───────────
+   1 │ Hello, world!
+─────┴───────────
+```
+
+## And you can compose *anything*
+
+::: {.code-40}
+```nix
+let
+inner = pkgs.writeTextFile {
+  name = "inner.txt";
+  text = "I am the inner derivation.";
+};
+in
+pkgs.writeTextFile {
+  name = "outer.txt";
+  text = ''
+	I am the outer derivation.
+	The inner derivation lives at: ${inner}
+	Inner contents:
+	${builtins.readFile inner}
+  '';
+};
+```
+```nix
+╭─wolf at wolf-laptop in /tmp/tmp.RmsgK6BtQ0
+╰─○ cat result 
+─────┬───────────
+     │ File: result
+─────┼───────────
+   1 │ I am the outer derivation.
+   2 │ The inner derivation lives at: /nix/store/cn5lv3xaky5mp8zqijfnn9sgr18yvy22-inner.txt
+   3 │ Inner contents:
+   4 │ I am the inner derivation.
+─────┴────────────
+```
+:::
+
+## Nix is an *Operating System*
+
+Inputs
+
+- Nixpkgs (more on this later)
+- Linux kernel Source
+- Stdenv (includes bash, coreutils, etc)
+- A bunch of config files ~/.config/..., /etc/...
+- A touch of magic 
+
+## Nix is an *Operating System*
+
+Outputs:
+
+- The **Exact** state of my computer
+
+```nix
+{
+  description = "An ENTIRE system configuration";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  } @ inputs: {
+    nixosConfigurations.my-nixos = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        {
+          users.users.wolf = {
+            description = "wolf";
+            openssh.authorizedKeys.keys = [
+              "ssh-ed25519 %3Csome-public-key%3E wolf@wolf-pc"
+            ];
+            packages = with pkgs; [firefox];
+          };
+          services.openssh = {
+            enable = true;
+            settings = {
+              PermitRootLogin = "no";
+              PasswordAuthentication = false;
+            };
+            openFirewall = true;
+          };
+        }
+      ];
+    };
+  };
+}
+```
+
+## Nix is *everything*
+
+::: {.code-40}
+```nix
+{
+  description = "minimal nixvim config";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixvim.url  = "github:nix-community/nixvim";
+  };
+
+  outputs = { nixpkgs, nixvim, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      packages.${system}.default =
+        nixvim.legacyPackages.${system}.makeNixvim {
+          plugins = {
+            telescope.enable = true;
+            treesitter.enable = true;
+            lualine.enable = true;
+          };
+
+          opts = {
+            number = true;
+            relativenumber = true;
+            expandtab = true;
+            shiftwidth = 2;
+            tabstop = 2;
+          };
+
+          keymaps = [
+            {
+              key = "<leader>ff";
+              action = "<cmd>Telescope find_files<cr>";
+            }
+          ];
+        };
+    };
+}
+```
+
+```nix
+result
+├── bin
+│   ├── nixvim-print-init -> /nix/store/x1qp2z8v27gjxk632jr1r0cqxa9x1sp8-nixvim-print-init/bin/nixvim-print-init
+│   ├── nvim -> /nix/store/1m3328hy1wvhiczinr8wm10c2z04zp68-neovim-0.11.5/bin/nvim
+│   ├── nvim-python3 -> /nix/store/1m3328hy1wvhiczinr8wm10c2z04zp68-neovim-0.11.5/bin/nvim-python3
+│   └── nvim-ruby -> /nix/store/9d8pzk3ycqgkddc2i4d80rclnccmfs5r-neovim-ruby-env/bin/neovim-ruby-host
+├── lib
+│   └── nvim
+│       └── parser
+├── rplugin.vim -> /nix/store/1m3328hy1wvhiczinr8wm10c2z04zp68-neovim-0.11.5/rplugin.vim
+└── share
+    ├── applications
+    │   └── nvim.desktop -> /nix/store/1m3328hy1wvhiczinr8wm10c2z04zp68-neovim-0.11.5/share/applications/nvim.desktop
+    ├── icons
+    │   └── hicolor
+    ├── locale
+    │   ├── af
+    │   ├── ca
+    │   ├── cs
+    │   ├── cs.cp1250
+    │   ├── da
+    │   ├── de
+    │   ├── en_GB
+    │   ├── eo
+    │   ├── es
+    │   ├── fi
+    │   ├── fr
+    │   ├── ga
+    │   ├── it
+    │   ├── ja
+    │   ├── ja.euc-jp
+    │   ├── ko.UTF-8
+    │   ├── nb
+    │   ├── nl
+    │   ├── no
+    │   ├── pl.UTF-8
+    │   ├── pt_BR
+    │   ├── ru
+    │   ├── sk
+    │   ├── sk.cp1250
+    │   ├── sv
+    │   ├── tr
+    │   ├── uk
+    │   ├── vi
+    │   ├── zh_CN.UTF-8
+    │   └── zh_TW.UTF-8
+    ├── man
+    │   ├── man1
+    │   └── man5
+    └── nvim
+        └── runtime
+
+45 directories, 6 files
+```
+:::
+
+![](https://shares.404wolf.com/neovim-build-001.png)
+
+## And nix *has everything*
+
+![](https://static.404wolf.com/map_repo_size_fresh_0001.svg)
+
+## And nix isn't new
+
+::: {.columns}
+::: {.column}
+![](https://shares.404wolf.com/nix-paper-001.png)
+:::
+::: {.column}
+Completed in 2006!
+:::
+:::
+
+# With nix, you can...
+
+## Have a consistent developer environments
+
+With nix, you can guarantee that everyone on your team has the exact same tools. You aren't guaranteeing they have the same versions. You are guaranteeing they have the *EXACT* same tools.
+
+::: {.code-40}
+```nix
+{
+  description = "Wolf's Personal Website";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    myResume = {
+      url = "github:404wolf/resume-v2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }@inputs:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        packages.default = pkgs.callPackage ./nix/build.nix { inherit (self.inputs) myResume; };
+        devShells.default = pkgs.mkShell {
+          CLOUDFLARE_ACCOUNT_ID = "02e54289e54c9bca7d99203f8df8c230";
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true";
+          PUPPETEER_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
+          packages = with pkgs; [
+            nodejs
+            pnpm
+            typescript
+            nil
+            nixd
+            nixfmt-rfc-style
+            (pkgs.writeShellScriptBin "mmdc" ''
+              exec ${pkgs.mermaid-cli}/bin/mmdc -p puppeteer-config.json "$@"
+            '')
+            chromium
+          ];
+        };
+      }
+    );
+}
+```
+:::
+
+## Your stuff *never* breaks
+
+You can come back to your old janky project 40 years later.
+
+- Your computer's Python installation is 50.99.99
+- Javascript doesn't exist anymore
+- CWRUnix is now a 501c religion (not a cult!)
+- Case built another stupid 300M building
+- Kaler makes 1,000,000\*1.1^40=\$\$\$45M :)
+
+And run `nix build`
+
+And it "just works." I know it sounds too good to be true. I know.
+
+## Let's dive a bit deeper
+
+### Nix is *Different*
+
+Okay, so nix is a little different from the languages you're used to.
+
+### Nix is a *lazy language*
+
+```nix
+let
+  pkgs = builtins.trace "importing THE UNIVERSE" (import <nixpkgs> {});
+in
+  1
+```
+
+---
+
+### Nix is a *functional* language
+
+::: {.columns}
+::: {.column}
+A *functional language* is a language whose fundamental unit of composition is the first-class function.
+
+In functional programming, you have to change how you think. Now you're not just passing around objects, you're passing around *functions themselves*!
+:::
+::: {.column .code-40}
+```ts
+const nums = [1, 2, 3, 4, 5];
+
+const sumOfOdds =
+  nums
+    .filter(n => n % 2 !== 0)
+    .reduce((acc, n) => acc + n, 0);
+
+console.log(sumOfOdds); // 9
+```
+
+```ts
+const nums = [1, 2, 3, 4, 5];
+let sum = 0;
+
+for (const n of nums) {
+	if (n % 2 !== 0) {
+	  sum += n;
+	}
+}
+
+return sum;
+```
+:::
+:::
+
+---
+
+### Nix is *pure*
+
+Functions look like this:
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+This would not be possible:
+
+```ts
+let total = 0;
+
+function addToTotal(n: number): number {
+  total += n;
+  return total;
+}
+```
+
+---
+
+### This is HUGE
+
+When I build something with nix, all its inputs are dependent on all its input, and all those inputs on their inputs, down the nix seed tarball.
+
+```nix
+bootstrapTools = import <nix/fetchurl.nix> {
+url = "http://tarballs.nixos.org/stdenv-linux/x86_64/c5aabb0d603e2c1ea05f5a93b3be82437f5ebf31/bootstrap-tools.tar.xz";
+sha256 = "a5ce9c155ed09397614646c9717fc7cd94b1023d7b76b618d409e4fefd6e9d39";
+};
+```
+
+---
+
+### Nix solves dependency hell
+
+::: {.columns}
+::: {.column}
+![](https://shares.404wolf.com/dep-hell-001.png)
+:::
+::: {.column}
+![](https://shares.404wolf.com/mutating-001.png)
+:::
+:::
+
+---
+
+### And nix has a **crazy**  standard library
+
+You can COMPOSE your builds using totally crazy functions:
+
+```nix
+{ pkgs, ... }:
+pkgs.buildInLinuxVM {
+  name = "super super super duper duper pure and reproducable";
+  pkg = pkgs.writeTextFile {
+    name = "hello.txt";
+    text = "hello world";
+    destination = "/hello.txt";
+  };
+}
+```
+
+You can build docker containers with nix, and merge in all your builds:
+
+```nix
+{ pkgs, ... }:
+pkgs.dockerTools.buildImage {
+  name = "gnu-hello";
+  tag = "simple";
+  contents = [ pkgs.hello ];
+  config.Cmd = [ "${pkgs.hello}/bin/hello" ];
+}
+```
+
+# Some fundamentals
+
+## The "nix store"
+
+![](https://medias.meow.social/media_attachments/files/113/611/636/284/183/702/original/f2acc27aec0593f4.jpg)
+ 
+## The "nix store"
+
+Remember earlier when we said nix functions could return literally anything? Any binary you want!
+The nix store is where all of your function results live. Every function result is neatly stuffed into a box, where the name of the box is the hash of the function producing it or the output of the function.
+
+This technique is called a "content addressable store," because, well, everything is addressed by itself, its own *content*.
+
+## The "nix store"
+
+So let's build the hello world from earlier again, but slower:
+```
+Nix expression
+      v eval
+Derivation (.drv)
+      v realise
+Store output
+      v consume
+Exact file
+```
+
+## The Result!
+
+![](https://shares.404wolf.com/nix-build-example-001.png)
+
+## We hid something from you
+
+How is it reproducible??
+
+We used a `flake.nix`!
+
+```nix
+{
+  inputs = {
+    `nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";`
+  }; # Specify inputs with URIs
+  outputs = {self, ...}: {}; # A function!
+}
+```
+
+## What is a flake?
+
+- An entrypoint
+- Like `package.json` or `pyproject.toml` or `Cargo.toml`
+
+Usually, it:
+
+- States which version of the universe (nixpkgs) you want to use for builds and developer environments
+- Defines some outputs, like your packages, shells, operating systems, deep dark secrets
+
+## But how does it stay pure? `flake.lock`
+
+```json
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1719690277,
+        "narHash": "sha256-0xSej1g7eP2kaUF+JQp8jdyNmpmCJKRpO12mKl/36Kc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2741b4b489b55df32afac57bc4bfd220e8bf617e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+  "root": "root",
+  "version": 7
+}
+```
+
+## Let's build something else, more nontrivial
+
+I wrote a hello world in `c`!
+
+```c
+#include <stdio.h>
+
+int main() {
+  printf("Hello, World!\n");
+  return 0;
+}
+```
+
+::: {.code-40}
+```nix
+{
+  description = "C Hello world";
+
+  inputs = {
+    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  };
+
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem ( system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        packages.default = pkgs.stdenv.mkDerivation {
+          pname = "hello";
+          version = "1.0";
+          src = self; # code at the last commit
+          nativeBuildInputs = [ pkgs.gcc ];
+          buildPhase = ''
+            gcc -o hello ./hello.c
+          '';
+          installPhase = ''
+            mkdir -p $out/bin
+            cp hello $out/bin
+          '';
+        };
+      }
+    );
+}
+```
+:::
+
+## Do you want to Breath Nix?
+
+Use Nixos!
+Use Home manager! (works on Mac!)
+Maybe even use impermanence....
+
+![](https://shares.404wolf.com/Impermanence-001.png)

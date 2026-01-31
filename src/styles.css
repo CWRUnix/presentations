@@ -58,3 +58,8 @@ marquee {
       url('https://github.com/web-fonts/dejavu-sans/raw/refs/heads/master/fonts/dejavu-sans-webfont.woff') format('woff'),
       url('https://github.com/web-fonts/dejavu-sans/raw/refs/heads/master/fonts/dejavu-sans-webfont.ttf') format('trutype');
 }
+
+.reveal .code-40 pre.sourceCode code {
+  max-height: 20vh;
+  overflow-y: auto;
+}
