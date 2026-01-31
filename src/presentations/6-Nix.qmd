@@ -586,10 +586,23 @@ int main() {
 ```
 :::
 
-## Do you want to Breath Nix?
+## Other Nix Concepts to be covered later
+
+- Garbage Collection
+- Development in nix shells
+- robotnix
+- Nix search pathes and flake registries
+- Package repos and other things about nixpkgs
+- Other builders
+- NixOS modules
+- The Nix ecosystem (,!)
+- New(ish) Experimental Features
+
+## Do you want to Breathe Nix?
 
 Use Nixos!
 Use Home manager! (works on Mac!)
 Maybe even use impermanence....
 
 ![](https://shares.404wolf.com/Impermanence-001.png)
+
