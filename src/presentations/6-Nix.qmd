@@ -424,6 +424,27 @@ sha256 = "a5ce9c155ed09397614646c9717fc7cd94b1023d7b76b618d409e4fefd6e9d39";
 
 ---
 
+### Garbage Collection
+
+Over time, you accumulate a lot of stuff.
+
+Nix automatically cleans up what you're not using. 
+
+If I build zzz-mypackage using "nix build" it adds an entry to gc-roots
+
+```
+root: /home/my-build/result (link to this added to `/nix/var/gc-roots`)
+  └── depends on /nix/store/zzz-mypackage-1.0
+        └── depends on /nix/store/yyy-zlib-1.2.13
+        └── depends on /nix/store/xxx-stdenv
+              └── depends on /nix/store/www-bash
+              └── ...
+```
+
+If I remove /home/my-build/result then it's fair game!
+
+---
+
 ### And nix has a **crazy**  standard library
 
 You can COMPOSE your builds using totally crazy functions:
@@ -605,4 +626,3 @@ Use Home manager! (works on Mac!)
 Maybe even use impermanence....
 
 ![](https://shares.404wolf.com/Impermanence-001.png)
-
