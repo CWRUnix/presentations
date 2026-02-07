@@ -45,6 +45,54 @@ derivation {
 
 ---
 
+### Fixed output derivations
+
+```nix
+{
+  stdenv,
+  makeWrapper,
+  jdk,
+  gradle,
+}: let
+    # create a fixed-output derivation which captures our dependencies
+    deps = stdenv.mkDerivation {
+        pname = "my-app-deps";
+        version = "1.0.0";
+        src = ./.;
+
+        # run the same build as our main derivation to ensure we capture the correct set of dependencies
+        buildPhase = ''
+            export GRADLE_USER_HOME=$(mktemp -d)
+            gradle --no-daemon installDist
+        '';
+
+        # take the cached dependencies and convert them into a maven repo structure
+        installPhase = ''
+            find $GRADLE_USER_HOME/caches/modules-2 -type f -regex '.*\.\(jar\|pom\)' \
+                | LC_ALL=C sort \
+                | perl -pe 's#(.*/([^/]+)/([^/]+)/([^/]+)/[0-9a-f]{30,40}/([^/\s]+))$# ($x = $2) =~ tr|\.|/|; "install -Dm444 $1 \$out/$x/$3/$4/$5" #e' \
+                | sh
+            '';
+
+        # specify the content hash of this derivations output
+        outputHashAlgo = "sha256";
+        outputHashMode = "recursive";
+        outputHash = "sha256-Om4BcXK76QrExnKcDzw574l+h75C8yK/EbccpbcvLsQ=";
+    };
+in stdenv.mkDerivation {
+    pname = "my-app";
+    version = "1.0.0";
+
+    # elided for brevity
+
+    # bring in the fixed-output derivation as a depdendency of our main build
+    nativeBuildInputs = [ gradle makeWrapper deps ];
+
+}
+```
+
+---
+
 ### Common builders
 
 - `mkDerivation[NoCC]`
@@ -66,6 +114,38 @@ derivation {
 - `fetchFromGit[hub/lab]`
 - `requireFile`
 - `fetchtorrent`
+
+---
+
+### Examples
+
+::: {.code-40}
+```nix
+fetchtorrent {
+  config = {
+    peer-limit-global = 100;
+  };
+  url = "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c";
+  hash = "";
+}
+```
+
+```nix
+fetchurl {
+  url = "https://example.com/file.tar.gz";
+  hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+}
+```
+
+```nix
+requireFile {
+  name = "jdk-${version}_linux-x64_bin.tar.gz";
+  url = "https://www.oracle.com/java/technologies/javase-jdk11-downloads.html";
+  hash = "sha256-lL00+F7jjT71nlKJ7HRQuUQ7kkxVYlZh//5msD8sjeI=";
+}
+```
+
+:::
 
 ---
 
@@ -97,6 +177,10 @@ The standard environment provides the following packages:
 ### Tools provided by `stdenv`
 
 On Linux, `stdenv` also includes the `patchelf` utility.
+(A small utility to modify the dynamic linker and RPATH of ELF executables)
+
+RPATH (Run-time Search Path) is for embedded dynamic search paths for libraries that a binary relies on.
+It tells the linker/loader where to look for necessary shared libraries at runtime overriding or supplementing system default locations. 
 
 [https://nixos.org/manual/nixpkgs/stable/#chap-stdenv](https://nixos.org/manual/nixpkgs/stable/#chap-stdenv)
 
@@ -233,31 +317,6 @@ in
 
 ---
 
-### Cross platform builds
-
-Dependency propagation takes cross compilation into account, meaning that dependencies that cross platform boundaries are properly adjusted.
-
-To determine the exact rules for dependency propagation, we start by assigning to each dependency a couple of ternary numbers (-1 for build, 0 for host, and 1 for target) representing its dependency type, which captures how its host and target platforms are each “offset” from the depending derivation’s host and target platforms. The following table summarize the different combinations that can be obtained:
-
----
-
-### Cross platform builds
-
-:::{.small-table}
-| host → target | attribute name | offset | typical purpose |
-| --- | --- | --- | --- |
-| build --> build | depsBuildBuild | -1, -1 | compilers for build helpers |
-| build --> host | nativeBuildInputs | -1, 0 | build tools, compilers, setup hooks |
-| build --> target | depsBuildTarget | -1, 1 | compilers to build stdlibs to run on target |
-| host --> host | depsHostHost | 0, 0 | compilers to build C code at runtime (rare) |
-| host --> target | buildInputs | 0, 1 | libraries |
-| target --> target | depsTargetTarget | 1, 1 | stdlibs to run on target |
-:::
-
-We can define the process precisely with Natural Deduction using the inference rules below. This probably seems a bit obtuse, but so is the bash code that actually implements it! They’re confusing in very different ways so... hopefully if something doesn’t make sense in one presentation, it will in the other.
-
----
-
 ### The nix module system
 
 The nix module system is a way of defining a configuration with "options" and settings fully within the nix language.
@@ -280,14 +339,14 @@ The nix module system is a way of defining a configuration with "options" and se
     optionName = mkEnableOption "this cool module";
 
     optionName = mkOption {
-    name = "option";
-    type = lib.types.bool;
-    default = false;
-    example = true;
-    description = "Whether to enable this cool module.";
-    merge = ...; # type is allowed to set a default merge strategy
-    apply = ...; # same with apply
-    options = {}; # suboptions for this module
+      name = "option";
+      type = lib.types.bool;
+      default = false;
+      example = true;
+      description = "Whether to enable this cool module.";
+      merge = ...; # type is allowed to set a default merge strategy
+      apply = ...; # same with apply
+      options = {}; # suboptions for this module
     }
 }
 ```
@@ -310,14 +369,11 @@ Only settings of the highest priority will be merged.
 
 ## Quirks of nixOS
 
-- Dynamic linking
-- Patching binaries and (auto)patchelf
-
 ---
 
 ### Dynamic binaries don't "just work"
 
-- Dynamic linking. You can use LD_LIBRARY_PATH
+- Dynamic linking. You can use LD_LIBRARY_PATH though!
 - Patching binaries and (auto)patchelf. Autopatchelf will look at all inputs and link the .so files in the buildInputs with inlined nix store references. So they are still dynamically linked but they are dynamically linked to specific paths.
 
 ---
@@ -359,3 +415,32 @@ Only settings of the highest priority will be merged.
 
 - Remote builders
 - Binary Caches
+
+---
+
+# WIP
+
+### Cross platform builds
+
+Dependency propagation takes cross compilation into account, meaning that dependencies that cross platform boundaries are properly adjusted.
+
+To determine the exact rules for dependency propagation, we start by assigning to each dependency a couple of ternary numbers (-1 for build, 0 for host, and 1 for target) representing its dependency type, which captures how its host and target platforms are each “offset” from the depending derivation’s host and target platforms. The following table summarize the different combinations that can be obtained:
+
+---
+
+### Cross platform builds
+
+:::{.small-table}
+| host → target | attribute name | offset | typical purpose |
+| --- | --- | --- | --- |
+| build --> build | depsBuildBuild | -1, -1 | compilers for build helpers |
+| build --> host | nativeBuildInputs | -1, 0 | build tools, compilers, setup hooks |
+| build --> target | depsBuildTarget | -1, 1 | compilers to build stdlibs to run on target |
+| host --> host | depsHostHost | 0, 0 | compilers to build C code at runtime (rare) |
+| host --> target | buildInputs | 0, 1 | libraries |
+| target --> target | depsTargetTarget | 1, 1 | stdlibs to run on target |
+:::
+
+We can define the process precisely with Natural Deduction using the inference rules below. This probably seems a bit obtuse, but so is the bash code that actually implements it! They’re confusing in very different ways so... hopefully if something doesn’t make sense in one presentation, it will in the other.
+
+---
