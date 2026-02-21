@@ -1,0 +1,52 @@
+---
+title: "Technical Philosophy Club"
+author: "Wolf (President) and Trevor (Vice)"
+---
+
+## Mission Statement
+
+::: {.columns}
+::: {.column width="25%"}
+![](https://static-prod-us-east-1.campusgroups.com/upload/cwru/2026/image_4860193_drawing_80d3b58e-3135-4be6-9c24-3ec7e853771b_124232611.png)
+:::
+::: {.column width="75%"}
+
+The mission of the Techanical Philosophy Club is to:
+
+- Foster a community exploring the philosophical dimensions of technology
+- Provide a forum for critical examination of technical systems and paradigms and their societal implications
+- Promote interdisciplinary dialogue between philosophy, computer science, engineering, and related fields within the university community
+:::
+:::
+
+## Events
+
+- Weekly readings and discussions
+- Watching talks together
+- Going to conventions (like those of the open source foundation) that have a focus on higher level discussion
+- Have guest speakers including CWRU professors like Prof. Loui!
+- Debate GBs on pre-decided topics
+
+## Uniqueness
+
+- Totally novel - no clubs like this currently on campus
+- Distinct from: Cybercwru, CCC, Quantum
+
+None of the other clubs on campus discuss the philosophy behind the skills!
+
+## Why we want to incorporate
+
+- Being able to reserve spaces on campus
+- Being able to put up fliers and advertise events as an official club org
+- Google group for email and CG discoverability
+- Guest parking for external speakers
+- Funding to support our events
+- Maybe case cash readers for merch?
+
+## Continuity Plan
+
+- Flyers and advertisments for larger events
+- Proactively training members to be future exec members
+- Maintaining documents on how the club is run
+- Collaborations with other clubs to both benefit their members and grow our club
+- Yearly elections following the academic cycle
