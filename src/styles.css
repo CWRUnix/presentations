@@ -16,10 +16,9 @@ span.nodeLabel {
   text-align: center;
 }
 
-.reveal table {
+.reveal table, .smaller {
   font-size: smaller;
 }
-
 
 marquee {
   height: 100%;
