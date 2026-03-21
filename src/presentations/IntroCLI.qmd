@@ -209,6 +209,72 @@ key = os.getenv("API_KEY")
 
 This is excellent for private information that is necessary for your program to run, but not to be put in your VCS.
 
+## Globs
+
+Match multiple files at once without typing each one.
+
+- `*` — anything (`*.log`, `data_*`)
+- `**` - globstar, recursively any directory (`**/*.txt`) 
+- `?` — one character (`file?.txt`)
+- `{a,b}` — either (`{jpg,png}`)
+
+```bash
+rm *.tmp
+cp **/*data_{2024,2025}.csv ~/backup
+```
+
+Globs are a way to select multiple files at once from your terminal while being a lot easier to write and understand than regex. Bash will expand them for you before passing to whatever program you call.
+
+## Making a Script
+
+A script is just a bunch of bash commands that get run automatically in sequence:
+
+```bash
+#!/usr/bin/env bash
+echo "Hello, world!"
+mv ~/Downloads/*.md ~/Documents
+```
+
+The shebang (`#!`) tells Linux "use this program to run this file." You should typically use `/usr/bin/env {PROGRAM}` to remain POSIX compliant and portable. (not `/bin/bash`)
+
+```bash
+chmod +x myscript.sh   # make it executable
+./myscript.sh          # run it
+```
+
+You can make any text file executable:
+
+```python
+#!/usr/bin/env python3
+print("Hello!")
+```
+
+## Tmux
+
+**Tmux** keeps sessions alive after you disconnect. SSH into a server, start a process, detach, close your laptop — it's still running when you come back.
+
+```bash
+tmux new -s work      # start a session
+tmux attach -t work   # return to it later
+```
+
+`Ctrl+B` is the prefix: `%` splits vertically, `"` horizontally, arrows move between panes, `D` detaches.
+
+## Vim
+
+**Vim** is a terminal text editor on virtually every Unix machine you'll ever touch. No mouse, no GUI.
+
+Vim has *modes*. Press `I` to type, `Esc` to stop.
+
+| Command | Action |
+|---|---|
+| `:w` | save |
+| `:q!` | quit (no save) |
+| `dd` | delete line |
+| `/foo` | search |
+
+Knowing how to open a file, make a change, and get out is a survival skill on remote servers without GUI access.
+
 # Fun advanced stuff
 
 ---
@@ -233,6 +299,62 @@ docker run -it myenv bash
 
 And use a shell from the container
 
+## CI/CD
+
+Continuous Integration/Continuous Development is a way to script out build processes and deployments to enable a tighter development loop.
+
+Almost all CI/CD have a way to specify what script to run in order to do something with your project, making it even more important to understand your own build process or script without the use of GUI tools, as it is a lot easier to automate.
+
+## CD/CD
+
+For example, these presentations are build with Github actions:
+
+```yaml
+name: Releases
+on:
+  push:
+    tags:
+      - "release-*"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+      - name: Build Project
+        shell: bash
+        run: |
+          nix build --experimental-features "nix-command flakes" .#pages
+      - name: Copy files for GitHub Pages
+        run: |
+          cp -r result/ pages/
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        with:
+          enablement: true
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages/
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Build Release
+        shell: bash
+        run: |
+          nix build --experimental-features "nix-command flakes" .#release
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "result/*"
+```
+
 ## Nix developer shells
 
 - A package manager, like `brew` or `apt` but more powerful
@@ -254,5 +376,4 @@ And use a shell from the container
 
 # Try it out!
 
----
-
+We have some time to go around and answer any questions, so try it out and we would be able to help do what you need to do.
