@@ -80,21 +80,6 @@ Bash is just another application on your computer. When you open a terminal wind
 3. It spawns the `ls`  app (as a process!) and gathers the results. Then it shows them to you!
 4. It says "what do you want to do next"
 
-## Aside: processes
-
-Your operating system manages a bunch of processes, which are programs that you run. Firefox, Discord, Spotify -- all processes maybe running on your computer!
-
-Most of these processes silently run in the background, and you can interact with them by clicking buttons in a GUI (graphical user interface).
-
-## Bash
-
-Bash is just another application on your computer. When you open a terminal window on your computer, you are using the REPL (read-evaluate-print-loop) version of a shell.
-
-1. It says "what do you want to do"
-2. You say "list files in this folder" (by typing `ls`)
-3. It spawns the `ls`  app (as a process!) and gathers the results. Then it shows them to you!
-4. It says "what do you want to do next"
-
 ## Bash is a programming language
 
 ```bash
@@ -113,7 +98,7 @@ In shell languages every bare (that isn't a keyword) word tries to spawn a proce
 
 They also have similar core concepts like setting environmental variables.
 
-## Common programs
+## Common programs {.scrollable}
 
 How do you run a program? You just type its name.
 Want to list the files in a directory?
@@ -126,7 +111,6 @@ buzz/
 foobar.txt
 ```
 
-:::{.scrollable height=20%}
 - `pwd`: print working directory
 - `mkdir`: create a new directory
 - `rm`: remove files or directories
@@ -144,13 +128,11 @@ foobar.txt
 - `clear`: clear the terminal screen
 - `exit`: close the terminal session
 - `whoami`: display the current user
-:::
 
 ## Navigating directories with `cd`
 
 `cd` changes your current directory. `~` is shorthand for your home directory.
 
-:::{.scrollable height=20%}
 ```bash
 pwd
 cd ..      # go up one directory
@@ -160,9 +142,8 @@ cd /foo    # go to "/foo" from the filesystem root (absolute path)
 cd ~       # go to your home directory
 pwd
 ```
-:::
 
-Hidden files start with `.`.
+Hidden files start with `.`
 
 ## Standard Output (stdout)
 
