@@ -146,6 +146,24 @@ foobar.txt
 - `whoami`: display the current user
 :::
 
+## Navigating directories with `cd`
+
+`cd` changes your current directory. `~` is shorthand for your home directory.
+
+:::{.scrollable height=20%}
+```bash
+pwd
+cd ..      # go up one directory
+cd .       # stay in the current directory (often useful in scripts)
+cd ./foo   # go into "foo" relative to where you are now
+cd /foo    # go to "/foo" from the filesystem root (absolute path)
+cd ~       # go to your home directory
+pwd
+```
+:::
+
+Hidden files start with `.`.
+
 ## Standard Output (stdout)
 
 When a program runs, it needs somewhere to send its output. By default, that place is your terminal screen — this is called **stdout** (standard output).
