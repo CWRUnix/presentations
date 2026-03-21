@@ -1,0 +1,258 @@
+---
+title: "Introduction to your CLI"
+author: "Presented by Trevor and Wolf"
+---
+
+# What is a terminal?
+
+![](https://cdn.discordapp.com/attachments/1228342637501616138/1484973060120379483/maxresdefault.png?ex=69c02c6e&is=69bedaee&hm=5ebb6debfe94b858f2022d5591923b16d4dea919d719ec32f86dfcf6da6f85ea&)
+
+A way to talk to your computer in pure text. Computers used to not have screens, and after they did, no GUIs. This was once the de-facto way to talk to your computer!
+
+# But Why use your terminal in 2026?
+
+---
+
+## Because you can do more stuff faster
+
+If I want to move all files ending in .mp4 on my laptop from Downloads to Documents, I could open a finder window, sort by file type, select them, cut them, go to Documents, and paste them, or I could just type `mv ~/Downloads/*.mp4 ~/Documents`.
+
+If I want to ... (two more examples on this slide to motivate)
+
+## Because developer tools in the terminal are better
+
+- Git
+- Ability to script and automate tasks
+- CI/CD
+- Good for doing one-off tasks in a quick and dirty way
+- More granular control over your development environment
+
+# Some core first-time fundamentals
+
+When you type a command, what is going on?
+
+"ls" "cat" "firefox" are all valid terminal commands. A terminal "command" is just an executable -- an "App" on your computer
+
+# CLI for Projects
+
+You might be used to clicking the "run" button to run your programs.
+
+:::{.columns}
+:::{.column .smaller width="50%"}
+But this is bad!
+
+![](https://shares.404wolf.com/run-button-001.png){height=200px}
+
+- You don't know what is actually running
+- You lose control over the details
+:::
+:::{.column .smaller width="50%"}
+It's better to be explicit:
+
+![](https://shares.404wolf.com/what-runs-what-001.png){height=200px}
+:::
+:::
+
+# Getting started
+
+---
+
+## First things first
+
+You may think the "terminal" and the commands we talk about today are Linux commands. You may think that "cd" and "top" and "ls" are Linux utilities. But that's false!
+
+Macs also have all these programs too. And windows has its own shell, which has hard-to-use alternatives.
+
+You can follow along no matter what OS you are using (but if you are on Windows it may be easiest if you use WSL + Linux so you can more easily use bash).
+
+## Aside: processes
+
+Your operating system manages a bunch of processes, which are programs that you run. Firefox, Discord, Spotify -- all processes maybe running on your computer!
+
+Most of these processes silently run in the background, and you can interact with them by clicking buttons in a GUI (graphical user interface).
+
+## Bash
+
+Bash is just another application on your computer. When you open a terminal window on your computer, you are using the REPL (read-evaluate-print-loop) version of a shell.
+
+1. It says "what do you want to do"
+2. You say "list files in this folder" (by typing `ls`)
+3. It spawns the `ls`  app (as a process!) and gathers the results. Then it shows them to you!
+4. It says "what do you want to do next"
+
+## Aside: processes
+
+Your operating system manages a bunch of processes, which are programs that you run. Firefox, Discord, Spotify -- all processes maybe running on your computer!
+
+Most of these processes silently run in the background, and you can interact with them by clicking buttons in a GUI (graphical user interface).
+
+## Bash
+
+Bash is just another application on your computer. When you open a terminal window on your computer, you are using the REPL (read-evaluate-print-loop) version of a shell.
+
+1. It says "what do you want to do"
+2. You say "list files in this folder" (by typing `ls`)
+3. It spawns the `ls`  app (as a process!) and gathers the results. Then it shows them to you!
+4. It says "what do you want to do next"
+
+## Bash is a programming language
+
+```bash
+for i in $(seq 1 100); do
+  if   [ $((i % 15)) -eq 0 ]; then echo "FizzBuzz"
+  elif [ $((i % 3))  -eq 0 ]; then echo "Fizz"
+  elif [ $((i % 5))  -eq 0 ]; then echo "Buzz"
+  else echo $i
+  fi
+done
+```
+
+**What is the difference between normal languages and shell languages?**
+
+In shell languages every bare (that isn't a keyword) word tries to spawn a process with that name.
+
+They also have similar core concepts like setting environmental variables.
+
+## Common programs
+
+How do you run a program? You just type its name.
+Want to list the files in a directory?
+
+```
+$ ls
+foo/
+bar/
+buzz/
+foobar.txt
+```
+
+:::{.scrollable height=20%}
+- `pwd`: print working directory
+- `mkdir`: create a new directory
+- `rm`: remove files or directories
+- `cp`: copy files or directories
+- `mv`: move or rename files
+- `cat`: display file contents
+- `tail`: show the last lines of a file
+- `grep`: search for patterns in files
+- `find`: search for files in a directory tree
+- `chmod`: change file permissions
+- `chown`: change file owner and group
+- `echo`: print text to the terminal
+- `man`: display the manual for a command
+- `history`: show previously run commands
+- `clear`: clear the terminal screen
+- `exit`: close the terminal session
+- `whoami`: display the current user
+:::
+
+## Standard Output (stdout)
+
+When a program runs, it needs somewhere to send its output. By default, that place is your terminal screen — this is called **stdout** (standard output).
+
+When you run `ls`, it prints a list of files. That list is being written to stdout, which bash helpfully displays in your terminal.
+
+There's also **stderr** (standard error) for error messages.
+
+When you use `print()` `printf()` `console.log()` `System.out.printf()` it goes to stdout! When you `throw Error("hi")` it goes to stderr.
+
+## Redirection `>`
+
+Instead of letting stdout print to your screen, you can **redirect** it somewhere else — usually a file.
+
+```bash
+ls > files.txt
+```
+
+This runs `ls` as normal, but instead of printing to your terminal, the output gets written into `files.txt`. The file is created if it doesn't exist, or **overwritten** if it does.
+
+You can think of `>` as a pipe that takes whatever a program was going to say to you, and pours it into a file instead
+
+## Redirection `>>`
+
+Use `>>` to **append** instead of overwrite:
+
+```bash
+echo "hello" >> log.txt
+echo "world" >> log.txt
+```
+
+Now `log.txt` contains both lines.
+
+## Environment Variables
+
+- Key-value pairs your shell keeps in memory
+- Available to any program you run
+- `echo $HOME` — your home directory
+- `echo $PATH` — where bash looks for programs
+- `export MY_VAR=hello` — set one yourself
+- `.env` files — store variables for a project, don't commit them
+
+## Environment Example
+
+We define some variables in our `.env` file.
+
+```bash
+# .env
+API_KEY=abc123
+```
+
+We can load it in python or any other language at runtime!
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+key = os.getenv("API_KEY")
+```
+
+This is excellent for private information that is necessary for your program to run, but not to be put in your VCS.
+
+# Fun advanced stuff
+
+---
+
+## There are other shells
+
+- Zsh: Similar, more "sane" bash like shell
+- Nushell: Totally different kind of shell, everything has TYPES
+- Fish: Designed for better completions and to be easier to use
+
+## Dev Containers
+
+Package your entire dev environment into a container
+
+```bash
+docker build -t myenv .
+docker run -it myenv bash
+```
+
+- `-it` — interactive terminal
+- `bash` — drop straight into a shell inside the containe
+
+And use a shell from the container
+
+## Nix developer shells
+
+- A package manager, like `brew` or `apt` but more powerful
+- Packages are isolated
+- Reproducible: same install everywhere
+- `nix-shell -p ffmpeg` -- temporary shell with ffmpeg, gone when you exit
+- `flake.nix` lets anyone get the your exact same setup
+
+```nix
+{
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
+  outputs = { nixpkgs, ... }: {
+    devShells.default = nixpkgs.mkShell {
+      packages = [ nixpkgs.ffmpeg nixpkgs.git ];
+    };
+  };
+}
+```
+
+# Try it out!
+
+---
+
