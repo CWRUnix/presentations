@@ -1,0 +1,451 @@
+---
+title: "Nix Part 2"
+author: "Presented by Trevor and Wolf"
+---
+
+# Nix Part 2!
+
+## Practical example: how to use a nix shell
+
+## What is a Derivation
+
+- Nix derivations are built into the language as the `derivation` keyword
+- Due to nix's functional nature, you likely will never need to use this raw
+- derivations are a way to fully specify how to obtain any artifact lazily
+
+```nix
+derivation {
+  name = "hello_cwrunix";
+  system = "x86_64-linux";
+  builder = "${bash}/bin/bash";
+  args = [ "-c" "echo hello CWRUnix > $out" ];
+  outputs = ["out"];
+  # ...
+}
+```
+
+---
+
+### More advanced derivation building
+
+- Nix by default will automatically calculate what dependencies are required during the runtime of your artifact
+    - There are multiple ways to get access to or modify this dependency graph with other arguments to `derivation`
+        - `[dis]allowedReferences`
+        - `[dis]allowedRequisites`
+        - `exportReferencesGraph`
+        - `unsafeDiscardReferences`
+
+---
+
+### More advanced derivation building
+
+- Fixed output derivations also require a few additional arguments
+    - This is similar to the `fetchurl` builtin
+    - `outputHash`, `outputHashAlgo` `outputHashMode`
+- There are some other additional arguments for more specific needs
+    - `outputChecks` - Additional checks to run after the build
+    - `requiredSystemFeatures` - Required build features
+    - `preferLocalBuild` - Prefers to use local builders
+    - `allowSubstitutes` - Allows derivation substitution
+
+---
+
+### Fixed output derivations
+
+```nix
+{
+  stdenv,
+  makeWrapper,
+  jdk,
+  gradle,
+}: let
+    # create a fixed-output derivation which captures our dependencies
+    deps = stdenv.mkDerivation {
+        pname = "my-app-deps";
+        version = "1.0.0";
+        src = ./.;
+
+        # run the same build as our main derivation to ensure we capture the correct set of dependencies
+        buildPhase = ''
+            export GRADLE_USER_HOME=$(mktemp -d)
+            gradle --no-daemon installDist
+        '';
+
+        # take the cached dependencies and convert them into a maven repo structure
+        installPhase = ''
+            find $GRADLE_USER_HOME/caches/modules-2 -type f -regex '.*\.\(jar\|pom\)' \
+                | LC_ALL=C sort \
+                | perl -pe 's#(.*/([^/]+)/([^/]+)/([^/]+)/[0-9a-f]{30,40}/([^/\s]+))$# ($x = $2) =~ tr|\.|/|; "install -Dm444 $1 \$out/$x/$3/$4/$5" #e' \
+                | sh
+            '';
+
+        # specify the content hash of this derivations output
+        outputHashAlgo = "sha256";
+        outputHashMode = "recursive";
+        outputHash = "sha256-Om4BcXK76QrExnKcDzw574l+h75C8yK/EbccpbcvLsQ=";
+    };
+in stdenv.mkDerivation {
+    pname = "my-app";
+    version = "1.0.0";
+
+    # elided for brevity
+
+    # bring in the fixed-output derivation as a depdendency of our main build
+    nativeBuildInputs = [ gradle makeWrapper deps ];
+
+}
+```
+
+---
+
+### Common builders
+
+- `mkDerivation[NoCC]`
+- `runCommand[CC]`
+- `writeText[File]`
+- `writeScript[Bin]`
+- `writeShellApplication`
+- `symlinkJoin`
+- `buildFHSenv`
+- `write[Direct]ReferencesToFile`
+
+---
+
+### Common Fetchers
+
+- `fetchurl`
+- `fetchzip`
+- `fetchgit`
+- `fetchFromGit[hub/lab]`
+- `requireFile`
+- `fetchtorrent`
+
+---
+
+### Examples
+
+::: {.code-40}
+```nix
+fetchtorrent {
+  config = {
+    peer-limit-global = 100;
+  };
+  url = "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c";
+  hash = "";
+}
+```
+
+```nix
+fetchurl {
+  url = "https://example.com/file.tar.gz";
+  hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+}
+```
+
+```nix
+requireFile {
+  name = "jdk-${version}_linux-x64_bin.tar.gz";
+  url = "https://www.oracle.com/java/technologies/javase-jdk11-downloads.html";
+  hash = "sha256-lL00+F7jjT71nlKJ7HRQuUQ7kkxVYlZh//5msD8sjeI=";
+}
+```
+
+:::
+
+---
+
+### Tools provided by `stdenv`
+
+The standard environment provides the following packages:
+
+::: {.columns}
+::: {.column}
+- The GNU C Compiler, configured with C and C++ support.
+- GNU coreutils (contains a few dozen standard Unix commands).
+- GNU findutils (contains `find`).
+- GNU diffutils (contains `diff`, `cmp`).
+:::
+::: {.column}
+- GNU `sed`.
+- GNU `grep`.
+- GNU `awk`.
+- GNU `tar`.
+- `gzip`, `bzip2` and `xz`.
+- GNU Make.
+- Bash
+- The `patch` command.
+:::
+:::
+
+---
+
+### Tools provided by `stdenv`
+
+On Linux, `stdenv` also includes the `patchelf` utility.
+(A small utility to modify the dynamic linker and RPATH of ELF executables)
+
+RPATH (Run-time Search Path) is for embedded dynamic search paths for libraries that a binary relies on.
+It tells the linker/loader where to look for necessary shared libraries at runtime overriding or supplementing system default locations.
+
+[https://nixos.org/manual/nixpkgs/stable/#chap-stdenv](https://nixos.org/manual/nixpkgs/stable/#chap-stdenv)
+
+---
+
+### About mkDerivation
+
+`mkDerivation` is a helper function to make it easy to set up the environment for builds
+
+Most packages in nixpkgs uses `mkDerivation`:
+
+```nix
+{
+  callPackage,
+  lib,
+  stdenv,
+  fetchurl,
+  nixos,
+  testers,
+  versionCheckHook,
+  hello,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "hello";
+  version = "2.12.2";
+
+  src = fetchurl {
+    url = "mirror://gnu/hello/hello-${finalAttrs.version}.tar.gz";
+    hash = "sha256-WpqZbcKSzCTc9BHO6H6S9qrluNE72caBm0x6nc4IGKs=";
+  };
+
+  # The GNU Hello configure script detects how to link libiconv but fails to actually make use of that.
+  # Unfortunately, this cannot be a patch to Makefile.am because autoreconfHook causes a gettext
+  # infrastructure mismatch error when trying to build hello.
+  env = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    NIX_LDFLAGS = "-liconv";
+  };
+
+  doCheck = true;
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+
+  # Give hello some install checks for testing purpose.
+  postInstallCheck = ''
+    stat "{!outputBin}/bin/{finalAttrs.meta.mainProgram}"
+  '';
+
+  passthru.tests = {
+    version = testers.testVersion { package = hello; };
+  };
+
+  passthru.tests.run = callPackage ./test.nix { hello = finalAttrs.finalPackage; };
+
+  meta = {
+    description = "Program that produces a familiar, friendly greeting";
+    longDescription = ''
+      GNU Hello is a program that prints "Hello, world!" when you run it.
+      It is fully customizable.
+    '';
+    homepage = "https://www.gnu.org/software/hello/manual/";
+    changelog = "https://git.savannah.gnu.org/cgit/hello.git/plain/NEWS?h=v${finalAttrs.version}";
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ stv0g ];
+    mainProgram = "hello";
+    platforms = lib.platforms.all;
+    identifiers.cpeParts.vendor = "gnu";
+  };
+})
+```
+
+---
+
+### mkDerivatrion phases
+
+Passthru attributes in Nix derivations are extra metadata attached to the top-level derivation that don't affect the build output or hash. It stores extra stuff in the expressio
+
+Some of the arguments are standard across all builds in all of nixpkgs.
+
+::: {.columns}
+::: {.column}
+[The unpack phase](https://nixos.org/manual/nixpkgs/stable/#ssec-unpack-phase)
+
+[The patch phase](https://nixos.org/manual/nixpkgs/stable/#ssec-patch-phase)
+
+[The configure phase](https://nixos.org/manual/nixpkgs/stable/#ssec-configure-phase)
+
+[The build phase](https://nixos.org/manual/nixpkgs/stable/#build-phase)
+
+[The check phase](https://nixos.org/manual/nixpkgs/stable/#ssec-check-phase)
+:::
+::: {.column}
+[The install phase](https://nixos.org/manual/nixpkgs/stable/#ssec-install-phase)
+
+[The fixup phase](https://nixos.org/manual/nixpkgs/stable/#ssec-fixup-phase)
+
+[The installCheck phase](https://nixos.org/manual/nixpkgs/stable/#ssec-installCheck-phase)
+
+[The distribution phase](https://nixos.org/manual/nixpkgs/stable/#ssec-distribution-phase)
+:::
+:::
+
+
+---
+
+### Overriding
+
+```nix
+{ pkgs }:
+
+let
+  # Take existing package and override its mkDerivation attrs
+  myHello = pkgs.hello.overrideAttrs (old: {
+    # change the source
+    src = pkgs.fetchFromGitHub {
+      owner = "myuser";
+      repo  = "my-hello-fork";
+      rev   = "abcdef1234567890abcdef1234567890abcdef12";
+      sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
+
+    # optionally tweak other mkDerivation inputs
+    version = "1.0-custom";
+    patches = (old.patches or []) ++ [ ./my-fix.patch ];
+  });
+in
+{
+  environment.systemPackages = [ myHello ];
+}
+```
+
+---
+
+### The nix module system
+
+The nix module system is a way of defining a configuration with "options" and settings fully within the nix language.
+
+```nix
+{ config, pkgs, ... }:
+{
+  imports = [];
+  options = {};
+  config = {};
+}
+```
+
+---
+
+### Nix module Options
+
+```nix
+{
+    optionName = mkEnableOption "this cool module";
+
+    optionName = mkOption {
+      name = "option";
+      type = lib.types.bool;
+      default = false;
+      example = true;
+      description = "Whether to enable this cool module.";
+      merge = ...; # type is allowed to set a default merge strategy
+      apply = ...; # same with apply
+      options = {}; # suboptions for this module
+    }
+}
+```
+
+---
+
+### Merging your config files
+
+Config options may be defined in multiple places and with different priorities. Once the full config is evaluated, all settings for a specific option are merged according to the option merge strategy.
+
+Only settings of the highest priority will be merged.
+
+```nix
+{
+    mysetting = mkOverride 1000 true;
+    mysetting = mkDefault true;
+    mysetting = mkForce true;
+}
+```
+
+## Quirks of nixOS
+
+---
+
+### Dynamic binaries don't "just work"
+
+- Dynamic linking. You can use LD_LIBRARY_PATH though!
+- Patching binaries and (auto)patchelf. Autopatchelf will look at all inputs and link the .so files in the buildInputs with inlined nix store references. So they are still dynamically linked but they are dynamically linked to specific paths.
+
+---
+
+### Dynamic binaries don't "just work"
+
+- You don't have a `/lib` or a `/bin`. `buildFHSEnv` will make a file system namespace with `/bin` and `/lib` etc folders linked to other folders on the host. It uses bubblewrap!
+- Some things try to write to the same spot they are installed to. Programs that are "self updating" by replacing their own binary, or store configuration relative to the install (think global pip!)
+- Nix evaluation is slow! This is an unsolved problem.
+
+---
+
+### Bad software doesn't work properly
+
+- Not respecting XDG
+- Not finding libraries
+- Hardcoding pathes that are expected to exist
+
+## "Experimental" features
+
+- Flakes
+- CA-stores
+- recursive-nix
+- IFD
+- parallel-nix
+- overlay stores and ssh stores
+
+## The Nix Ecosystem
+
+- home-manager
+- impermanence
+- disko
+- comma
+- nix-ld
+- stylix
+- robotnix
+
+## Other cool nix things
+
+- Remote builders
+- Binary Caches
+
+---
+
+# WIP
+
+### Cross platform builds
+
+Dependency propagation takes cross compilation into account, meaning that dependencies that cross platform boundaries are properly adjusted.
+
+To determine the exact rules for dependency propagation, we start by assigning to each dependency a couple of ternary numbers (-1 for build, 0 for host, and 1 for target) representing its dependency type, which captures how its host and target platforms are each “offset” from the depending derivation’s host and target platforms. The following table summarize the different combinations that can be obtained:
+
+---
+
+### Cross platform builds
+
+:::{.small-table}
+| host → target | attribute name | offset | typical purpose |
+| --- | --- | --- | --- |
+| build --> build | depsBuildBuild | -1, -1 | compilers for build helpers |
+| build --> host | nativeBuildInputs | -1, 0 | build tools, compilers, setup hooks |
+| build --> target | depsBuildTarget | -1, 1 | compilers to build stdlibs to run on target |
+| host --> host | depsHostHost | 0, 0 | compilers to build C code at runtime (rare) |
+| host --> target | buildInputs | 0, 1 | libraries |
+| target --> target | depsTargetTarget | 1, 1 | stdlibs to run on target |
+:::
+
+We can define the process precisely with Natural Deduction using the inference rules below. This probably seems a bit obtuse, but so is the bash code that actually implements it! They’re confusing in very different ways so... hopefully if something doesn’t make sense in one presentation, it will in the other.
+
+---

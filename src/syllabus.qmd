@@ -16,17 +16,19 @@ Discord: [discord.gg/gsGZbJbxkU](https://discord.gg/gsGZbJbxkU)
 
 ## Executive Teaching Board
 
-| Exec Member      | Discord Handle | Email          | Website                |
-| ---------------- | -------------- | -------------- | ---------------------- |
-| Trevor Nichols   | .pmis          | tln32@case.edu | github.com/tnichols217 |
-| Wolf Mermelstein | 404wolf        | wsm32@case.edu | 404wolf.com            |
-| Evan Harnak      | chainsawpants  | ebh58@case.edu | evaniel.bandcamp.com   |
+| Exec Member      | Discord Handle | Email           | Website                 |
+| ---------------- | -------------- | --------------- | ----------------------- |
+| Trevor Nichols   | .pmis          | tln32@case.edu  | github.com/tnichols217  |
+| Brandon Li       | .aspiringlich  | bcl72@case.edu  | github.com/aspiringLich |
+| Amelia Magdovitz | jessiesys      | ahm119@case.edu |                         |
+| Remy Dai         | remy_d.        | mxd792@case.edu |                         |
+| Catrina Chen     | qilincatrina.  | qxc251@case.edu |                         |
 
 # Semester Overview
 
 ## Meeting Times
 
-18:15 - 21:30
+16:30 - 18:30
 Student Organization Center (West side)
 Tinkham Veale Student Center
 

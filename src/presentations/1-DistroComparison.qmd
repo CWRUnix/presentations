@@ -1,6 +1,6 @@
 ---
 title: "Distro Comparison"
-author: "Presented by Trevor and Evan"
+author: "Presented by Trevor"
 ---
 
 ## Landscape at a Glance
