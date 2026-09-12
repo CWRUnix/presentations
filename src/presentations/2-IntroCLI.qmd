@@ -5,7 +5,7 @@ author: "Presented by Trevor and Wolf"
 
 # What is a terminal?
 
-![](https://cdn.discordapp.com/attachments/1228342637501616138/1484973060120379483/maxresdefault.png?ex=69c02c6e&is=69bedaee&hm=5ebb6debfe94b858f2022d5591923b16d4dea919d719ec32f86dfcf6da6f85ea&)
+![](./2/terminal.jpeg)
 
 A way to talk to your computer in pure text. Computers used to not have screens, and after they did, no GUIs. This was once the de-facto way to talk to your computer!
 
@@ -41,15 +41,53 @@ You might be used to clicking the "run" button to run your programs.
 :::{.column .smaller width="50%"}
 But this is bad!
 
-![](https://shares.404wolf.com/run-button-001.png){height=200px}
+![](./2/run.webp){height=200px}
 
 - You don't know what is actually running
 - You lose control over the details
 :::
 :::{.column .smaller width="50%"}
-It's better to be explicit:
+It's typically better to be explicit
 
-![](https://shares.404wolf.com/what-runs-what-001.png){height=200px}
+```bash
+# Courtesy of Void
+do_build() {
+	export AS="${CC}"
+	export CFLAGS="-O2"
+	export CXXFLAGS="-O2"
+	# unset HOST_C{,XX}FLAGS since the firefox build system uses them internally and
+	# if they are exported they end up in the cargo environment, where they are not
+	# supposed to be.
+	unset HOST_CFLAGS
+	unset HOST_CXXFLAGS
+	export LDFLAGS="-Wl,-rpath=/usr/lib/firefox"
+	# export LDFLAGS+="-Wl,--threads=${XBPS_MAKEJOBS}"
+
+	if [ "$build_option_clang" ]; then
+		export CC=clang
+		export CXX=clang++
+		export AS=clang
+		export AR=llvm-ar
+		export NM=llvm-nm
+		export HOST_CC=clang
+		export HOST_CXX=clang++
+
+		export ASFLAGS="--target=${XBPS_CROSS_TRIPLET:-${XBPS_TRIPLET}}"
+	fi
+
+	disable_jemalloc() {
+		if [ "$XBPS_TARGET_LIBC" = "musl" ]; then
+			echo "ac_add_options --disable-jemalloc"
+		fi
+	}
+
+	disable_elfhack() {
+		case "$XBPS_TARGET_MACHINE" in
+		x86_64*|i686*|arm*|aarch64*) echo "ac_add_options --disable-elf-hack" ;;
+		esac
+	}
+...
+```
 :::
 :::
 
@@ -147,13 +185,25 @@ Hidden files start with `.`
 
 ## Standard Output (stdout)
 
-When a program runs, it needs somewhere to send its output. By default, that place is your terminal screen — this is called **stdout** (standard output).
+When a program runs, it needs somewhere to send its output. By default, that place is your terminal screen — this is called **stdout** (standard output, FD 1).
 
 When you run `ls`, it prints a list of files. That list is being written to stdout, which bash helpfully displays in your terminal.
 
-There's also **stderr** (standard error) for error messages.
+There's also **stderr** (standard error, FD 2) for error messages.
 
 When you use `print()` `printf()` `console.log()` `System.out.printf()` it goes to stdout! When you `throw Error("hi")` it goes to stderr.
+
+## Piping `|`
+
+The pipe operator in bash redirects stdout to stdin of the following command
+
+For example:
+
+```bash
+cmatrix | lolcat
+```
+
+The pipe error operator `|&` connect stdout and stderr to the stdin of the next command
 
 ## Redirection `>`
 
@@ -177,6 +227,27 @@ echo "world" >> log.txt
 ```
 
 Now `log.txt` contains both lines.
+
+## More complicated Redirection `>&`
+
+Use `&>` to redirect stdout and stderr output to the specified location.
+
+Use `2>&1` to redirect stderr to stdout.
+
+You can open arbitrary FD stream for a program with this as well! `3> special.log`
+
+Demo:
+
+```py
+import os
+os.write(3, b"test\n")
+```
+
+## Send to background `&`
+
+Putting a single `&` after a command will run that command asynchronously in the background.
+
+The `;` operator acts like a new-line, denoting the next command, however will not run it asynchronously.
 
 ## Environment Variables
 
@@ -213,7 +284,7 @@ This is excellent for private information that is necessary for your program to 
 Match multiple files at once without typing each one.
 
 - `*` — anything (`*.log`, `data_*`)
-- `**` - globstar, recursively any directory (`**/*.txt`) 
+- `**` - globstar, recursively any directory (`**/*.txt`)
 - `?` — one character (`file?.txt`)
 - `{a,b}` — either (`{jpg,png}`)
 
@@ -223,6 +294,43 @@ cp **/*data_{2024,2025}.csv ~/backup
 ```
 
 Globs are a way to select multiple files at once from your terminal while being a lot easier to write and understand than regex. Bash will expand them for you before passing to whatever program you call.
+
+## Here-docs `<<` and here-strings `<<<`
+
+You may use the here operators to quickly pipe something into the stdin of a command, without needing to `echo something |` it.
+
+For example, instead of `echo "hello" | lolcat` it is also possible to `lolcat <<< "hello"`
+
+Here-docs on the other hand are multi-line:
+
+```bash
+MESSAGE=hello
+python - << EOF
+print("$MESSAGE")
+EOF
+```
+
+Using `<<-` instead of `<<` will strip leading tabs from the here-doc, and quoting your delimiter (`"EOF"` instead of `EOF`) will disable variable expansion.
+
+## Subshells `$()`
+
+You may use the `$()` to execute a command as an argument to another command.
+
+For example: `echo $(echo hello)`
+
+The older method for doing this was to use the backtick \`\`, but this is not nestable and considered out of date now.
+
+## Quoting
+
+Quotes act as a single argument to any command or function, which is useful when passing pathes with spaces within them.
+
+| Quote Type | Variable Expansion `$VAR / $(cmd)` | Globe / Wildcard Expansion `*, ?` | Word Splitting (Spaces) |
+| - | - | - | - |
+| Double Quotes `""` | Evaluates | Literal | Keeps as 1 string |
+| Single Quotes `''` | Literal | Literal | Keeps as 1 string |
+| Unquoted | Evaluates | Expands filenames | Splits on whitespace |
+
+There is also escapable strings, `$''` which allow for escape sequences like `\n` to evaluate
 
 ## Making a Script
 
@@ -354,24 +462,13 @@ jobs:
           artifacts: "result/*"
 ```
 
-## Nix developer shells
+## Development Shells (devshells)
 
-- A package manager, like `brew` or `apt` but more powerful
-- Packages are isolated
-- Reproducible: same install everywhere
-- `nix-shell -p ffmpeg` -- temporary shell with ffmpeg, gone when you exit
-- `flake.nix` lets anyone get the your exact same setup
+- The concept that there is a specialized shell for a specific project you're working on, providing the necessary tools and programs to work on that project.
+- A python `venv` or a docker `devcontainer`
+- Nix also has its own devshells `nix-shell` or `nix shell`
 
-```nix
-{
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
-  outputs = { nixpkgs, ... }: {
-    devShells.default = nixpkgs.mkShell {
-      packages = [ nixpkgs.ffmpeg nixpkgs.git ];
-    };
-  };
-}
-```
+See: `flake.nix` for this repo or try it quickly with `nix shell nixpkgs#bash`
 
 # Try it out!
 

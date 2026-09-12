@@ -19,7 +19,7 @@ format:
     # incremental: true
     css: styles.css
 # execute:
-  # cache: true
+# cache: true
 brand:
   light: _brand.yml
   dark: _brand.yml

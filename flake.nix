@@ -71,7 +71,7 @@
         };
         packages = rec {
           presentations = pkgs.callPackage ./nix/build.nix {inherit pythonPkg;};
-          zipped = pkgs.callPackage ./nix/zipped.nix { src = presentations; };
+          zipped = pkgs.callPackage ./nix/zipped.nix {src = presentations;};
           release = zipped;
           pages = presentations;
           default = presentations;

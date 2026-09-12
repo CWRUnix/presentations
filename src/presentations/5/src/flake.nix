@@ -10,17 +10,15 @@
     };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      ...
-    }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  } @ inputs:
     flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
+      system: let
+        pkgs = import nixpkgs {inherit system;};
 
         treefmtconfig = inputs.treefmt-nix.lib.evalModule pkgs {
           projectRootFile = "go.mod";
@@ -30,8 +28,7 @@
             nixfmt.enable = true;
           };
         };
-      in
-      {
+      in {
         devShells = {
           default = pkgs.mkShell {
             CGO_ENABLED = 0;
