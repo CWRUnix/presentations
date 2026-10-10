@@ -3,10 +3,6 @@ title: "Filesystems"
 author: "Presented by Trevor"
 ---
 
-<marquee behavior="alternate" direction="up" scrollamount="25"><marquee behavior="alternate" scrollamount="50">
-<h1> WELCOME TO CWRU LINUX CLUB </h1>
-</marquee></marquee>
-
 # 1: Intro to Filesystems
 
 ## What is a Filesystem
@@ -21,19 +17,19 @@ Stored as a tree, with folders and files.
 
 /boot
 ├── EFI
-│   ├── BOOT
-│   │   └── BOOTX64.EFI
-│   ├── Linux
-│   ├── nixos
-│   │   ├── 3wpmjs32cmbsrxdj2pn3a04hcrfyxzsj-linux-6.16.6-bzImage.efi
-│   │   ├── 7kbjk7q5nyhvl6fgyygiwad84wb16jy8-initrd-linux-6.16.6-initrd.efi
-│   └── systemd
-│       └── systemd-bootx64.efi
+│   ├── BOOT
+│   │   └── BOOTX64.EFI
+│   ├── Linux
+│   ├── nixos
+│   │   ├── 3wpmjs32cmbsrxdj2pn3a04hcrfyxzsj-linux-6.16.6-bzImage.efi
+│   │   ├── 7kbjk7q5nyhvl6fgyygiwad84wb16jy8-initrd-linux-6.16.6-initrd.efi
+│   └── systemd
+│       └── systemd-bootx64.efi
 └── loader
     ├── entries
-    │   ├── nixos-generation-392.conf
-    │   ├── nixos-generation-393.conf
-    │   └── nixos-generation-394.conf
+    │   ├── nixos-generation-392.conf
+    │   ├── nixos-generation-393.conf
+    │   └── nixos-generation-394.conf
     ├── entries.srel
     ├── loader.conf
     └── random-seed
@@ -692,7 +688,7 @@ Older filesystems that are still used today
 | Ext4     | ✔      | ✘   | ✔    | ✘     | ✔       | Has quotas                 |
 | NTFS     | ✔      | ?   | ✔    | ✔     | ✘       | No UNIX permission         |
 | HFS+     | ✘      | ?   | ✘    | ✘     | ✘       | Hard links to directories  |
-| (ex)FAT  | ✘      | ✘   | ✘    | ✘     | ✘       | Supports nothing           | 
+| (ex)FAT  | ✘      | ✘   | ✘    | ✘     | ✘       | Supports nothing           |
 
 ## Modern Filesystems
 
@@ -700,7 +696,7 @@ Newer filesystems that are touted for their abilities
 
 | FS    | ECC | Multi Dev | Enc. | Notes               |
 | ----- | --- | --------- | ---- | ------------------- |
-| BtrFS | ✔   | ✔         | ✘    | B-trees, speedy     | 
+| BtrFS | ✔   | ✔         | ✘    | B-trees, speedy     |
 | APFS  | ✘   | ✘         | ✔    | No Hard linked Dirs |
 | ZFS   | ✔   | ✔         | ✔    | No extants          |
 
@@ -834,7 +830,7 @@ Common Linux tools for interacting with FS's
 
 ---
 
-### tune2fs 
+### tune2fs
 
 :::{.scrollable}
 - Usage: `sudo tune2fs [options] device`
@@ -1184,6 +1180,286 @@ struct ext4_super_block {
 };
 ```
 
+# 6: FUSE
+
+## What is FUSE
+
+**F**ilesystem in **USE**rspace
+
+- A mechanism for implementing a fully functional filesystem as a normal userspace process
+- No kernel module required — the filesystem *logic* is your program
+- A small kernel driver (`fuse.ko`) ferries VFS requests to your daemon over `/dev/fuse`
+- If your daemon crashes, the mount breaks — but the kernel doesn't panic with it
+
+## Kernel FS vs FUSE
+
+:::{.columns}
+:::{.column}
+**Kernel Filesystem (ext4)**
+
+- Runs in ring 0
+- Bugs = kernel panic
+- C only, no libc, no debugger
+- Loaded into the kernel itself
+- Root required to mount
+:::
+:::{.column}
+**FUSE Filesystem**
+
+- Runs as an ordinary, unprivileged process
+- Bugs = you segfault your own daemon
+- Any language, any library
+- Ships as a regular binary
+- Users can mount their own filesystems sudoless
+:::
+:::
+
+## Architecture
+
+:::{.columns}
+:::{.column width="42%"}
+
+```{mermaid}
+flowchart TD
+    A["Application"] -->|"syscall"| B["VFS"]
+    B --> C["fuse.ko"]
+    C -->|"serialize request"| D["/dev/fuse"]
+    D -->|"read()"| E["Your daemon"]
+    E -->|"write() reply"| D
+    D --> C
+    C --> B
+    B --> A
+```
+
+:::
+:::{.column width="58%"}
+- `fuse.ko` registers with the VFS like any other filesystem
+- Its `inode_operations` / `file_operations` don't touch a disk — they package the op into a struct and queue it on `/dev/fuse`
+- Your daemon blocks in `read()` on `/dev/fuse`, handles the request, and `write()`s the reply back
+- The calling process sleeps in the kernel the whole time
+:::
+:::
+
+---
+
+### Request Lifecycle
+
+```{mermaid}
+sequenceDiagram
+    participant App
+    participant VFS
+    participant K as fuse.ko
+    participant D as Daemon
+    App->>VFS: read("/mnt/fuse/hello")
+    VFS->>K: ->read() via file_operations
+    K->>D: FUSE_READ request on /dev/fuse
+    Note over D: your Python read() runs
+    D->>K: reply: b"Hello from FUSE!\n"
+    K->>VFS: data into page cache
+    VFS->>App: return 17
+```
+
+## The FUSE Protocol
+
+A binary request/response protocol spoken over the `/dev/fuse` character device
+
+Every request your daemon reads begins with this header:
+
+```C
+struct fuse_in_header {
+    uint32_t len;      // total length of the request
+    uint32_t opcode;   // which operation (FUSE_READ, ...)
+    uint64_t unique;   // id matching request <-> response
+    uint64_t nodeid;   // inode the operation targets
+    uint32_t uid;      // caller's uid
+    uint32_t gid;      // caller's gid
+    uint32_t pid;      // caller's pid
+    uint16_t con_ext;  // size of header extension (8-byte units)
+    uint16_t padding;
+};
+```
+
+---
+
+### And every reply
+
+```C
+struct fuse_out_header {
+    uint32_t len;     // total length of the reply
+    int32_t  error;   // 0 on success, otherwise -errno
+    uint64_t unique;  // echoed from the request
+};
+```
+
+- Errors are plain negative errnos (`-ENOENT`, `-EACCES`, ...)
+- `unique` lets the kernel match replies to sleeping callers, so the daemon may answer out of order / concurrently
+
+---
+
+### Opcodes
+
+Straight from the kernel source (`include/uapi/linux/fuse.h`) — notice these are just the VFS ops from section 2, serialized:
+
+```C
+enum fuse_opcode {
+    FUSE_LOOKUP      = 1,
+    FUSE_FORGET      = 2,   /* no reply */
+    FUSE_GETATTR     = 3,
+    FUSE_SETATTR     = 4,
+    FUSE_READLINK    = 5,
+    ...
+    FUSE_OPEN        = 14,
+    FUSE_READ        = 15,
+    FUSE_WRITE       = 16,
+    FUSE_STATFS      = 17,
+    FUSE_RELEASE     = 18,
+    ...
+    FUSE_INIT        = 26,  /* mount handshake: version + feature negotiation */
+    FUSE_OPENDIR     = 27,
+    FUSE_READDIR     = 28,
+    ...
+};
+```
+
+## libfuse
+
+The reference C library — most FUSE filesystems link it (the Python bindings included, via FFI)
+
+- **High-level API:** callbacks receive *paths*; libfuse maintains the path ↔ nodeid mapping for you
+- **Low-level API:** callbacks receive raw *nodeids* (inodes); you track lookup counts yourself (`FUSE_LOOKUP`/`FUSE_FORGET`)
+
+```C
+struct fuse_operations {
+    int (*getattr) (const char *, struct stat *, struct fuse_file_info *);
+    int (*mkdir)   (const char *, mode_t);
+    int (*unlink)  (const char *);
+    int (*rename)  (const char *, const char *, unsigned int flags);
+    int (*open)    (const char *, struct fuse_file_info *);
+    int (*read)    (const char *, char *, size_t, off_t, struct fuse_file_info *);
+    int (*write)   (const char *, const char *, size_t, off_t, struct fuse_file_info *);
+    int (*readdir) (const char *, void *, fuse_fill_dir_t, off_t, ...);
+    int (*fsync)   (const char *, int, struct fuse_file_info *);
+    ...
+};
+```
+
+Essentially `inode_operations` + `file_operations` from earlier — but invoked in *user* address space.
+
+## Mounting Mechanics
+
+- `/dev/fuse` is a character device; the daemon opens it to obtain the connection fd
+- `fusermount3` is a **setuid** helper that performs the actual `mount(2)` on behalf of unprivileged users
+- `/etc/fuse.conf`:
+    - `user_allow_other` — permit letting *other* users access your mounts
+
+---
+
+### Mount Lifecycle
+
+- On mount, the kernel sends `FUSE_INIT`; the daemon replies with the protocol version and the capabilities it supports
+- A dead or unresponsive daemon leaves callers hanging in **D state** (uninterruptible sleep)
+- Recover without rebooting by aborting the connection:
+
+```bash
+# find the stuck connection
+$ ls /sys/fs/fuse/connections/
+38
+
+# pending I/O fails with ENOTCONN, and the mount can be cleaned up
+$ echo 1 | sudo tee /sys/fs/fuse/connections/38/abort
+$ fusermount3 -u /mnt/fuse
+```
+
+## Things a FUSE Daemon Must Handle
+
+- `getattr` is called *constantly* — everything practically always stats files
+- The kernel caches your answers: `-o entry_timeout=`, `-o attr_timeout=`, `-o negative_timeout=`
+- Raise `FuseOSError(errno.X)` for errors — a traceback escaping a callback hangs the caller
+- `open`/`read`/`write`/`release` form a file-handle lifecycle — or omit `open` and stay stateless
+- libfuse serves requests on a thread pool by default — use `nothreads=True` while debugging
+- Paths are *not* stable identifiers: a file can be renamed mid-`read()` — use the `fh` from `open()` for anything stateful
+
+## Performance
+
+Every operation costs: syscall -> kernel -> context switch to daemon -> context switch back (both directions)
+
+Mitigations:
+
+- The kernel **page cache** serves most reads without ever calling you — unless you opt into `direct_io`
+- `-o writeback_cache` — buffer writes in the kernel, flushed on `fsync`/close
+- `-o max_write=131072` — larger requests, fewer round trips
+- `-o max_readahead=` — aggressive kernel readahead
+- `FUSE_PASSTHROUGH` (kernel 6.9+) — hand the kernel a backing fd at `open` time so it can do I/O directly, bypassing the daemon entirely
+
+Even so: don't put your database on a FUSE mount.
+
+## Real World FUSE Filesystems
+
+:::{.columns}
+:::{.column}
+- **sshfs** — mount remote directories over SFTP
+- **rclone mount** — S3/Drive/Dropbox as a folder
+- **gocryptfs / encfs** — per-file encryption layers
+- **ntfs-3g** — the NTFS driver everyone actually uses
+- **mergerfs** — pool a pile of JBOD disks
+:::
+:::{.column}
+- **archivemount** — mount tarballs and zips
+- **AppImage** — the portable-app format mounts *itself* via FUSE
+- **macFUSE / WinFsp** — the same idea on macOS and Windows
+:::
+:::
+
+## FUSE in Python
+
+| Library    | API level      | Notes                                              |
+| ---------- | -------------- | -------------------------------------------------- |
+| `fusepy`   | High (paths)   | ~1 file of ctypes over libfuse — the workshop uses this |
+| `pyfuse3`  | Low (inodes)   | async (trio/asyncio), actively maintained          |
+| `llfuse`   | Low (inodes)   | deprecated in favor of pyfuse3                     |
+
+You subclass `Operations`; any method you don't implement fails gracefully with `ENOSYS`.
+
+---
+
+### The Demo Filesystem
+
+`github.com/CWRUnix/FUSE-talk-2` — a minimal read-only FS exposing a single file, `/hello`
+
+- Implements just the four read-path ops: `getattr`, `readdir`, `open`, `read`
+- Every write op (`write`, `mkdir`, `unlink`, ...) is stubbed to raise `EROFS`
+- Mounted with `ro=True` and `use_ns=True`
+
+---
+
+### Running It
+
+```bash
+mkdir mnt
+# This builds and runs our FUSE mounter
+nix run github:CWRUnix/FUSE-talk-2 -- mnt
+ls -l mnt
+# -r--r--r-- 1 tev users 17 Oct 10 12:00 hello
+cat mnt/hello
+# Hello from FUSE!
+fusermount3 -u mnt
+```
+
+Note that `strace cat mnt/hello` shows nothing but ordinary `openat`/`read` syscalls
+
+## Workshop: Build a Filesystem
+
+`github.com/CWRUnix/FUSE-talk-2` — the write-path methods are all stubbed out with `EROFS`
+
+Try building your own FUSE:
+
+- `create` / `write` / `truncate` — make files writable
+- `unlink` / `mkdir` / `rmdir` / `rename` — mutate the tree
+- Drop `ro=True` in `cli.py` once you do
+- Run with `-d` to watch every request hit your code live
+
+Implement something crazy! Anything you can do in userspace can also be done in FUSE
+
 # Sources
 
 :::{.smaller .scrollable}
@@ -1203,4 +1479,11 @@ struct ext4_super_block {
 - https://www.geeksforgeeks.org/linux-unix/linux-tune2fs-command-with-examples/
 - https://linuxtechlab.com/du-df-commands-examples/
 - https://nixos.wiki/wiki/Disko
+
+- https://www.kernel.org/doc/html/latest/filesystems/fuse.html
+- https://github.com/torvalds/linux/blob/master/include/uapi/linux/fuse.h
+- https://github.com/libfuse/libfuse
+- https://github.com/fusepy/fusepy
+- https://man7.org/linux/man-pages/man8/mount.fuse3.8.html
+- https://en.wikipedia.org/wiki/Filesystem_in_Userspace
 :::
